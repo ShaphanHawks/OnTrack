@@ -33,7 +33,7 @@ export async function POST(request: Request) {
         {
           parts: [
             {
-              text: "From the following image of an appliance model tag, please extract the Model Number and the Serial Number. Clearly label them.",
+              text: "From the following image of an appliance model tag, extract ONLY the model number and serial number. Return them in this exact format without any additional text or markdown:\nModel: [MODEL_NUMBER]\nSerial: [SERIAL_NUMBER]",
             },
             {
               inline_data: {
@@ -91,17 +91,15 @@ export async function POST(request: Request) {
       let serialNumber = "Not found"
 
       // Try to find "Model Number:" or "Model:" (case-insensitive)
-      const modelMatch =
-        extractedText.match(/Model Number[:\s]+([\w-]+)/i) || extractedText.match(/Model[:\s]+([\w-]+)/i)
+      const modelMatch = extractedText.match(/Model:[\s]*([A-Za-z0-9-]+)/i)
+
+      // Try to find "Serial Number:" or "S/N:" or "Serial:" (case-insensitive)
+      const serialMatch = extractedText.match(/Serial:[\s]*([A-Za-z0-9-]+)/i)
+
       if (modelMatch && modelMatch[1]) {
         modelNumber = modelMatch[1]
       }
 
-      // Try to find "Serial Number:" or "S/N:" or "Serial:" (case-insensitive)
-      const serialMatch =
-        extractedText.match(/Serial Number[:\s]+([\w-]+)/i) ||
-        extractedText.match(/S\/N[:\s]+([\w-]+)/i) ||
-        extractedText.match(/Serial[:\s]+([\w-]+)/i)
       if (serialMatch && serialMatch[1]) {
         serialNumber = serialMatch[1]
       }
