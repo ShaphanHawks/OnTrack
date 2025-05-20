@@ -91,7 +91,7 @@ export async function POST(request: Request) {
       let serialNumber = "Not found"
 
       // Try to find "Model Number:" or "Model:" (case-insensitive)
-      const modelMatch = extractedText.match(/Model:[\s]*([A-Za-z0-9-]+)/i)
+      const modelMatch = extractedText.match(/Model:[\s]*([A-Za-z0-9-/]+)/i)
 
       // Try to find "Serial Number:" or "S/N:" or "Serial:" (case-insensitive)
       const serialMatch = extractedText.match(/Serial:[\s]*([A-Za-z0-9-]+)/i)
@@ -106,11 +106,12 @@ export async function POST(request: Request) {
 
       console.log("Extracted model:", modelNumber, "serial:", serialNumber)
 
+      // Only return the extracted model and serial numbers, not the full text
       return NextResponse.json({
         success: true,
         modelNumber,
         serialNumber,
-        fullText: extractedText,
+        // Removed fullText from the response
       })
     } else {
       throw new Error("No content found in Gemini response or unexpected response structure.")

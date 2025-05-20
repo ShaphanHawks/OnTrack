@@ -16,7 +16,6 @@ export function ApplianceScanner() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [modelNumber, setModelNumber] = useState<string | null>(null)
   const [serialNumber, setSerialNumber] = useState<string | null>(null)
-  const [fullText, setFullText] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const pasteAreaRef = useRef<HTMLDivElement>(null)
@@ -27,7 +26,6 @@ export function ApplianceScanner() {
     setError(null)
     setModelNumber(null)
     setSerialNumber(null)
-    setFullText(null)
   }
 
   // Process image data (common function for both upload and paste)
@@ -50,7 +48,6 @@ export function ApplianceScanner() {
       if (data.success) {
         setModelNumber(data.modelNumber || "Not found")
         setSerialNumber(data.serialNumber || "Not found")
-        setFullText(data.fullText || "")
       } else {
         throw new Error(data.error || "Failed to extract information")
       }
@@ -306,9 +303,9 @@ export function ApplianceScanner() {
                   <span className="ml-2 text-sm text-muted-foreground">Processing image...</span>
                 </div>
               ) : (
-                <>
+                <div className="space-y-2">
                   <div className="flex items-center justify-between bg-muted/50 p-2 rounded-md">
-                    <div>
+                    <div className="w-full">
                       <p className="text-xs text-muted-foreground">Model Number:</p>
                       <p className="text-sm font-medium">{modelNumber || "Upload an image to extract"}</p>
                     </div>
@@ -316,7 +313,7 @@ export function ApplianceScanner() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7"
+                        className="h-7 w-7 ml-2 flex-shrink-0"
                         onClick={() => copyToClipboard(modelNumber, "Model number")}
                       >
                         <Copy className="h-3.5 w-3.5" />
@@ -326,7 +323,7 @@ export function ApplianceScanner() {
                   </div>
 
                   <div className="flex items-center justify-between bg-muted/50 p-2 rounded-md">
-                    <div>
+                    <div className="w-full">
                       <p className="text-xs text-muted-foreground">Serial Number:</p>
                       <p className="text-sm font-medium">{serialNumber || "Upload an image to extract"}</p>
                     </div>
@@ -334,7 +331,7 @@ export function ApplianceScanner() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7"
+                        className="h-7 w-7 ml-2 flex-shrink-0"
                         onClick={() => copyToClipboard(serialNumber, "Serial number")}
                       >
                         <Copy className="h-3.5 w-3.5" />
@@ -342,14 +339,7 @@ export function ApplianceScanner() {
                       </Button>
                     )}
                   </div>
-
-                  {fullText && (
-                    <div className="mt-3 p-2 bg-muted/30 rounded-md">
-                      <p className="text-xs text-muted-foreground mb-1">Full AI Response:</p>
-                      <p className="text-xs whitespace-pre-wrap">{fullText}</p>
-                    </div>
-                  )}
-                </>
+                </div>
               )}
             </div>
             <div className="text-xs text-muted-foreground">
