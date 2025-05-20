@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server"
-import { GoogleGenerativeAI } from "@google/generative-ai"
 
 export async function POST(request: Request) {
   try {
@@ -10,9 +9,6 @@ export async function POST(request: Request) {
       console.error("API_KEY environment variable is not set")
       return NextResponse.json({ success: false, error: "API_KEY environment variable is not set" }, { status: 500 })
     }
-
-    // Initialize the Google Generative AI client
-    const genAI = new GoogleGenerativeAI(apiKey)
 
     // Parse the multipart form data
     const formData = await request.formData()
@@ -26,32 +22,72 @@ export async function POST(request: Request) {
 
     // Convert the file to a byte array
     const imageBytes = await imageFile.arrayBuffer()
+    const base64Image = Buffer.from(imageBytes).toString("base64")
 
-    // Create a model instance - using the correct model name format
-    // The correct format is "gemini-pro-vision" (not "gemini-1.0-pro-vision")
-    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" })
+    // Direct API call to Gemini 1.5 Flash
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
 
-    // Prepare the image for the API
-    const imageData = [...new Uint8Array(imageBytes)]
-    const imagePart = {
-      inlineData: {
-        data: Buffer.from(imageData).toString("base64"),
-        mimeType: imageFile.type,
-      },
+    // Prepare the request payload
+    const payload = {
+      contents: [
+        {
+          parts: [
+            {
+              text: "Please extract and return ONLY the model number and serial number from this appliance tag image. Format your response exactly like this example:\nModel: ABC123\nSerial: XYZ789\nIf you can't find one or both numbers, indicate with 'Not found'.",
+            },
+            {
+              inline_data: {
+                mime_type: imageFile.type,
+                data: base64Image,
+              },
+            },
+          ],
+        },
+      ],
     }
 
     console.log("Sending request to Gemini API...")
 
-    // Generate content with the image
-    const result = await model.generateContent([
-      "Please extract and return ONLY the model number and serial number from this appliance tag image. Format your response exactly like this example:\nModel: ABC123\nSerial: XYZ789\nIf you can't find one or both numbers, indicate with 'Not found'.",
-      imagePart,
-    ])
+    // Make the API request
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
 
-    const response = await result.response
-    const text = response.text()
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error("Gemini API error:", response.status, errorText)
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Gemini API error: ${response.status} ${response.statusText}. Details: ${errorText}`,
+        },
+        { status: 500 },
+      )
+    }
 
-    console.log("Gemini API response:", text)
+    const data = await response.json()
+    console.log("Gemini API response:", JSON.stringify(data))
+
+    // Extract the text from the response
+    let text = ""
+    if (
+      data.candidates &&
+      data.candidates[0] &&
+      data.candidates[0].content &&
+      data.candidates[0].content.parts &&
+      data.candidates[0].content.parts[0] &&
+      data.candidates[0].content.parts[0].text
+    ) {
+      text = data.candidates[0].content.parts[0].text
+    } else {
+      return NextResponse.json({ success: false, error: "Unexpected response format from Gemini API" }, { status: 500 })
+    }
+
+    console.log("Extracted text:", text)
 
     // Parse the model and serial numbers from the response
     const modelMatch = text.match(/Model:?\s*([^\n]+)/i)
