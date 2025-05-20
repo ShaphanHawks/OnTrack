@@ -207,13 +207,13 @@ export function ApplianceScanner() {
       <CardHeader className="p-3 pb-0">
         <CardTitle className="text-base">Appliance Model Tag Scanner</CardTitle>
       </CardHeader>
-      <CardContent className="p-3">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-2">
+      <CardContent className="p-3 flex flex-col items-center w-full">
+        <div className="w-full max-w-xl flex flex-col items-center">
+          <div className="w-full flex flex-col gap-3 items-center">
+            <div className="w-full flex flex-col md:flex-row gap-2 items-center justify-center">
               {/* File Upload Area */}
               <div
-                className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-2 h-40 cursor-pointer"
+                className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-2 h-40 w-full md:w-64 cursor-pointer"
                 onClick={handleUploadClick}
               >
                 {imagePreview ? (
@@ -245,7 +245,7 @@ export function ApplianceScanner() {
               {/* Clipboard Paste Area - Simplified */}
               <div
                 ref={pasteAreaRef}
-                className="flex flex-col items-center justify-center border border-input rounded-md p-2 h-40 cursor-text bg-background"
+                className="flex flex-col items-center justify-center border border-input rounded-md p-2 h-40 w-full md:w-64 cursor-text bg-background"
                 onClick={handlePasteAreaClick}
                 tabIndex={0} // Make it focusable
                 onPaste={(e: React.ClipboardEvent) => handlePaste(e.nativeEvent)}
@@ -271,7 +271,7 @@ export function ApplianceScanner() {
             </div>
 
             {/* Only keep the upload button, remove paste button */}
-            <Button onClick={handleUploadClick} disabled={isUploading || isProcessing} className="w-full" size="sm">
+            <Button onClick={handleUploadClick} disabled={isUploading || isProcessing} className="w-full mt-2" size="sm">
               {isUploading ? (
                 <>
                   <Loader2 className="mr-1 h-3 w-3 animate-spin" />
@@ -286,7 +286,7 @@ export function ApplianceScanner() {
             </Button>
 
             {/* Moved Extracted Information section here */}
-            <div className="space-y-2 mt-4">
+            <div className="space-y-2 mt-4 w-full">
               <p className="text-sm font-medium">Extracted Information:</p>
 
               {error && (
