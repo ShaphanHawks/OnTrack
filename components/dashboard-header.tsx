@@ -1,5 +1,4 @@
 import { Cpu } from "lucide-react"
-import { ApiStatusIndicator } from "@/components/api-status-indicator"
 
 export function DashboardHeader() {
   return (
@@ -9,9 +8,6 @@ export function DashboardHeader() {
         <h1 className="text-2xl font-bold">Utility Tools</h1>
       </div>
       <p className="text-muted-foreground max-w-2xl mb-2 text-sm">Manage your instances and utilities in one place</p>
-      <div className="flex justify-center w-full">
-        <ApiStatusIndicator />
-      </div>
     </div>
   )
 }

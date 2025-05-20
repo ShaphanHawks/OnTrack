@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { v4 as uuidv4 } from "uuid"
 import { getInstanceStatus } from "@/lib/tensordock-api"
+import { ApiStatusIndicator } from "@/components/api-status-indicator"
 
 export function InstancesModule() {
   // Instance list state
@@ -257,6 +258,7 @@ export function InstancesModule() {
   return (
     <Card className="shadow-sm">
       <CardHeader className="p-3 pb-0">
+        <div className="mb-2"><ApiStatusIndicator /></div>
         <div className="flex justify-between items-center">
           <CardTitle className="text-base">Instance Manager</CardTitle>
           <Button
