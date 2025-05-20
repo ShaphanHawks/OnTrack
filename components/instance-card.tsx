@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { Instance } from "@/lib/types"
 import { cn } from "@/lib/utils"
-import { startInstance, stopInstance, testTensorDockAuth } from "@/lib/tensordock-api"
+import { startInstance, stopInstance, testTensorDockAuth, getInstanceStatus } from "@/lib/tensordock-api"
 import { toast } from "@/components/ui/use-toast"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
@@ -100,8 +100,41 @@ export function InstanceCard({ instance, onDelete, onStatusChange }: InstanceCar
       const response = await (instance.status ? stopInstance(instance.instanceId) : startInstance(instance.instanceId))
 
       if (response.success) {
-        onStatusChange(instance.id, !instance.status)
-        setPowerMessage(`${instance.status ? "Stopped" : "Started"} successfully`)
+        // Poll for status confirmation
+        const expectedStatus = !instance.status; // true if turning on, false if turning off
+        const maxAttempts = 12; // 12 * 5s = 60s
+        let attempt = 0;
+        let confirmed = false;
+        while (attempt < maxAttempts) {
+          await new Promise((res) => setTimeout(res, 5000));
+          try {
+            const statusResp = await getInstanceStatus(instance.instanceId);
+            if (statusResp.success) {
+              const isOnline = statusResp.status === "running";
+              if (isOnline === expectedStatus) {
+                onStatusChange(instance.id, isOnline);
+                toast({
+                  title: `Instance is now ${isOnline ? "Online" : "Offline"}`,
+                  description: `The server has been confirmed ${isOnline ? "started" : "stopped"}.`,
+                });
+                confirmed = true;
+                break;
+              }
+            }
+          } catch (err) {
+            // Ignore polling errors, try again
+          }
+          attempt++;
+        }
+        if (!confirmed) {
+          setPowerWarning(true);
+          setPowerMessage("⚠️ Timed out waiting for server status confirmation.");
+          toast({
+            title: "Status Confirmation Timeout",
+            description: "Could not confirm the server's new state after 1 minute. Please check the provider dashboard.",
+            variant: "destructive",
+          });
+        }
       } else {
         setPowerWarning(true)
         setPowerMessage(`⚠️ ${response.message || `Still ${instance.status ? "On" : "Off"}`}`)
