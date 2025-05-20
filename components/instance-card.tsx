@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { Instance } from "@/lib/types"
 import { cn } from "@/lib/utils"
-import { startInstance, stopInstance } from "@/lib/tensordock-api"
+import { startInstance, stopInstance, testTensorDockAuth } from "@/lib/tensordock-api"
 import { toast } from "@/components/ui/use-toast"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
@@ -80,6 +80,18 @@ export function InstanceCard({ instance, onDelete, onStatusChange }: InstanceCar
   const handleTogglePower = async () => {
     setIsTogglingPower(true)
     setPowerWarning(false)
+
+    // Authorization check before power action
+    const authResult = await testTensorDockAuth();
+    if (!authResult.success) {
+      toast({
+        title: "Authorization Failed",
+        description: "Your API token is invalid or expired. Please check your credentials.",
+        variant: "destructive",
+      });
+      setIsTogglingPower(false);
+      return;
+    }
 
     const action = instance.status ? "Shutting down" : "Waking up"
     setPowerMessage(`${action}...`)
