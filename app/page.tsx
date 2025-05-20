@@ -1,7 +1,6 @@
 import { DashboardHeader } from "@/components/dashboard-header"
-import { AddInstanceForm } from "@/components/add-instance-form"
-import { InstanceList } from "@/components/instance-list"
 import { ApplianceScanner } from "@/components/appliance-scanner"
+import { InstancesModule } from "@/components/instances-module"
 
 export default function Dashboard() {
   return (
@@ -14,11 +13,7 @@ export default function Dashboard() {
         </div>
 
         <div className="mt-4">
-          <InstanceList />
-        </div>
-
-        <div className="mt-4">
-          <AddInstanceForm />
+          <InstancesModule />
         </div>
       </div>
     </div>
