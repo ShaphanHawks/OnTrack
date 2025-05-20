@@ -122,8 +122,6 @@ export function ApplianceScanner() {
 
       if (!e.clipboardData) return
 
-      resetStates()
-
       // Check if clipboard has images
       const items = e.clipboardData.items
       let imageItem = null
@@ -136,35 +134,29 @@ export function ApplianceScanner() {
       }
 
       if (!imageItem) {
-        toast({
-          title: "No image found",
-          description: "No image data found in clipboard",
-          variant: "destructive",
-        })
+        // Silently ignore non-image pastes
         return
       }
+
+      // Reset states for new processing
+      resetStates()
 
       // Get image as blob
       const blob = imageItem.getAsFile()
       if (!blob) return
 
-      setIsUploading(true)
-
       try {
         // Create image preview
         const reader = new FileReader()
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           setImagePreview(e.target?.result as string)
+
+          // Auto-trigger processing immediately after preview is set
+          await processImageData(blob, blob.type)
         }
         reader.readAsDataURL(blob)
-
-        setIsUploading(false)
-
-        // Process the image
-        await processImageData(blob, blob.type)
       } catch (error) {
         console.error("Error handling paste:", error)
-        setIsUploading(false)
         setError(error instanceof Error ? error.message : "Failed to process pasted image")
       }
     },
@@ -253,10 +245,10 @@ export function ApplianceScanner() {
                 />
               </div>
 
-              {/* Clipboard Paste Area */}
+              {/* Clipboard Paste Area - Simplified */}
               <div
                 ref={pasteAreaRef}
-                className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-2 h-40 cursor-pointer"
+                className="flex flex-col items-center justify-center border border-input rounded-md p-2 h-40 cursor-text bg-background"
                 onClick={handlePasteAreaClick}
                 tabIndex={0} // Make it focusable
                 onPaste={(e: React.ClipboardEvent) => handlePaste(e.nativeEvent)}
@@ -273,40 +265,28 @@ export function ApplianceScanner() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center text-center">
-                    <Clipboard className="h-6 w-6 text-muted-foreground mb-1" />
-                    <p className="text-xs text-muted-foreground">Paste from Clipboard</p>
-                    <p className="text-xs text-muted-foreground">Ctrl+V or ⌘+V</p>
+                    <Clipboard className="h-5 w-5 text-muted-foreground mb-1" />
+                    <p className="text-xs text-muted-foreground">Paste image here</p>
+                    <p className="text-xs text-muted-foreground">(Ctrl+V)</p>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <Button onClick={handleUploadClick} disabled={isUploading || isProcessing} className="w-full" size="sm">
-                {isUploading ? (
-                  <>
-                    <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                    Uploading...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="mr-1 h-3 w-3" />
-                    Upload
-                  </>
-                )}
-              </Button>
-
-              <Button
-                onClick={handlePasteAreaClick}
-                disabled={isUploading || isProcessing}
-                className="w-full"
-                size="sm"
-                variant="outline"
-              >
-                <Clipboard className="mr-1 h-3 w-3" />
-                Paste
-              </Button>
-            </div>
+            {/* Only keep the upload button, remove paste button */}
+            <Button onClick={handleUploadClick} disabled={isUploading || isProcessing} className="w-full" size="sm">
+              {isUploading ? (
+                <>
+                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-1 h-3 w-3" />
+                  Upload File
+                </>
+              )}
+            </Button>
           </div>
 
           <div className="space-y-3">
