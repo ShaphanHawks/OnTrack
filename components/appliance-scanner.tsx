@@ -3,11 +3,12 @@
 import type React from "react"
 
 import { useState, useRef } from "react"
-import { Upload, Copy, Loader2 } from "lucide-react"
+import { Upload, Copy, Loader2, AlertCircle } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import Image from "next/image"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export function ApplianceScanner() {
   const [isUploading, setIsUploading] = useState(false)
@@ -15,12 +16,18 @@ export function ApplianceScanner() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [modelNumber, setModelNumber] = useState<string | null>(null)
   const [serialNumber, setSerialNumber] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+
+    // Reset previous results and errors
+    setError(null)
+    setModelNumber(null)
+    setSerialNumber(null)
 
     // Check if file is an image
     if (!file.type.startsWith("image/")) {
@@ -43,8 +50,6 @@ export function ApplianceScanner() {
     }
 
     setIsUploading(true)
-    setModelNumber(null)
-    setSerialNumber(null)
 
     try {
       // Create image preview
@@ -67,10 +72,6 @@ export function ApplianceScanner() {
         body: formData,
       })
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`)
-      }
-
       const data = await response.json()
 
       if (data.success) {
@@ -81,6 +82,7 @@ export function ApplianceScanner() {
       }
     } catch (error) {
       console.error("Error processing image:", error)
+      setError(error instanceof Error ? error.message : "Failed to process image")
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to process image",
@@ -111,7 +113,10 @@ export function ApplianceScanner() {
       <CardContent className="p-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="space-y-3">
-            <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-4 h-40">
+            <div
+              className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-4 h-40 cursor-pointer"
+              onClick={handleUploadClick}
+            >
               {imagePreview ? (
                 <div className="relative w-full h-full">
                   <Image
@@ -143,6 +148,11 @@ export function ApplianceScanner() {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Uploading...
                 </>
+              ) : isProcessing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
               ) : (
                 <>
                   <Upload className="mr-2 h-4 w-4" />
@@ -155,6 +165,14 @@ export function ApplianceScanner() {
           <div className="space-y-3">
             <div className="space-y-2">
               <p className="text-sm font-medium">Extracted Information:</p>
+
+              {error && (
+                <Alert variant="destructive" className="py-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-xs ml-2">{error}</AlertDescription>
+                </Alert>
+              )}
+
               {isProcessing ? (
                 <div className="flex items-center justify-center h-20">
                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -167,7 +185,7 @@ export function ApplianceScanner() {
                       <p className="text-xs text-muted-foreground">Model Number:</p>
                       <p className="text-sm font-medium">{modelNumber || "Upload an image to extract"}</p>
                     </div>
-                    {modelNumber && (
+                    {modelNumber && modelNumber !== "Not found" && (
                       <Button
                         variant="ghost"
                         size="icon"
@@ -185,7 +203,7 @@ export function ApplianceScanner() {
                       <p className="text-xs text-muted-foreground">Serial Number:</p>
                       <p className="text-sm font-medium">{serialNumber || "Upload an image to extract"}</p>
                     </div>
-                    {serialNumber && (
+                    {serialNumber && serialNumber !== "Not found" && (
                       <Button
                         variant="ghost"
                         size="icon"

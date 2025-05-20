@@ -1,11 +1,19 @@
 import { NextResponse } from "next/server"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 
-// Initialize the Google Generative AI client
-const genAI = new GoogleGenerativeAI(process.env.API_KEY || "")
-
 export async function POST(request: Request) {
   try {
+    // Get API key from environment variables
+    const apiKey = process.env.API_KEY
+
+    if (!apiKey) {
+      console.error("API_KEY environment variable is not set")
+      return NextResponse.json({ success: false, error: "API_KEY environment variable is not set" }, { status: 500 })
+    }
+
+    // Initialize the Google Generative AI client
+    const genAI = new GoogleGenerativeAI(apiKey)
+
     // Parse the multipart form data
     const formData = await request.formData()
     const imageFile = formData.get("image") as File
@@ -14,11 +22,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "No image provided" }, { status: 400 })
     }
 
+    console.log("Image received:", imageFile.name, imageFile.type, imageFile.size)
+
     // Convert the file to a byte array
     const imageBytes = await imageFile.arrayBuffer()
 
-    // Create a model instance
-    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" })
+    // Create a model instance - using Gemini 1.0 Pro Vision which is designed for image + text tasks
+    const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro-vision" })
 
     // Prepare the image for the API
     const imageData = [...new Uint8Array(imageBytes)]
@@ -29,6 +39,8 @@ export async function POST(request: Request) {
       },
     }
 
+    console.log("Sending request to Gemini API...")
+
     // Generate content with the image
     const result = await model.generateContent([
       "Please extract and return ONLY the model number and serial number from this appliance tag image. Format your response exactly like this example:\nModel: ABC123\nSerial: XYZ789\nIf you can't find one or both numbers, indicate with 'Not found'.",
@@ -38,12 +50,16 @@ export async function POST(request: Request) {
     const response = await result.response
     const text = response.text()
 
+    console.log("Gemini API response:", text)
+
     // Parse the model and serial numbers from the response
     const modelMatch = text.match(/Model:?\s*([^\n]+)/i)
     const serialMatch = text.match(/Serial:?\s*([^\n]+)/i)
 
-    const modelNumber = modelMatch ? modelMatch[1].trim() : null
-    const serialNumber = serialMatch ? serialMatch[1].trim() : null
+    const modelNumber = modelMatch ? modelMatch[1].trim() : "Not found"
+    const serialNumber = serialMatch ? serialMatch[1].trim() : "Not found"
+
+    console.log("Extracted model:", modelNumber, "serial:", serialNumber)
 
     return NextResponse.json({
       success: true,
