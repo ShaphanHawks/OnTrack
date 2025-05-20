@@ -284,10 +284,9 @@ export function ApplianceScanner() {
                 </>
               )}
             </Button>
-          </div>
 
-          <div className="space-y-3">
-            <div className="space-y-2">
+            {/* Moved Extracted Information section here */}
+            <div className="space-y-2 mt-4">
               <p className="text-sm font-medium">Extracted Information:</p>
 
               {error && (
@@ -341,9 +340,6 @@ export function ApplianceScanner() {
                   </div>
                 </div>
               )}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              <p>Upload or paste an image of an appliance tag to automatically extract the model and serial numbers.</p>
             </div>
           </div>
         </div>
