@@ -13,13 +13,16 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     const instanceId = params.id
 
-    // Get all instances from TensorDock
+    // Get all instances from TensorDock with cache-busting
     const response = await fetch("https://dashboard.tensordock.com/api/v2/instances", {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
       },
       cache: "no-store", // Ensure we don't cache the response
+      next: { revalidate: 0 }, // Force revalidation on each request
     })
 
     if (!response.ok) {

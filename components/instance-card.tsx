@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { Instance } from "@/lib/types"
 import { cn } from "@/lib/utils"
-import { getInstanceStatus, startInstance, stopInstance } from "@/lib/tensordock-api"
+import { startInstance, stopInstance } from "@/lib/tensordock-api"
+import { toast } from "@/components/ui/use-toast"
 
 interface InstanceCardProps {
   instance: Instance
@@ -38,13 +39,38 @@ export function InstanceCard({ instance, onDelete, onStatusChange }: InstanceCar
   const handleRefreshStatus = async () => {
     setIsRefreshing(true)
     try {
-      const response = await getInstanceStatus(instance.instanceId)
-      if (response.success) {
-        const newStatus = response.status === "running"
+      // Add cache-busting parameter
+      const timestamp = new Date().getTime()
+      const response = await fetch(`/api/instances/${instance.instanceId}/status?t=${timestamp}`, {
+        method: "GET",
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+        },
+      })
+
+      if (!response.ok) throw new Error(`Status check failed: ${response.statusText}`)
+
+      const data = await response.json()
+      if (data.success) {
+        const newStatus = data.status === "running"
         onStatusChange(instance.id, newStatus)
+
+        if (newStatus !== instance.status) {
+          toast({
+            title: "Status Updated",
+            description: `Instance is now ${newStatus ? "Online" : "Offline"}`,
+          })
+        }
       }
     } catch (error) {
       console.error("Failed to refresh status:", error)
+      toast({
+        title: "Error",
+        description: "Failed to refresh status",
+        variant: "destructive",
+      })
     } finally {
       setIsRefreshing(false)
     }

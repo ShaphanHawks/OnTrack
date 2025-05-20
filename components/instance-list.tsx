@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { InstanceCard } from "@/components/instance-card"
 import { useToast } from "@/components/ui/use-toast"
 import type { Instance } from "@/lib/types"
-import { getInstanceStatus } from "@/lib/tensordock-api"
 import { Button } from "@/components/ui/button"
 import { RefreshCw } from "lucide-react"
 
@@ -51,20 +50,36 @@ export function InstanceList() {
     let hasChanges = false
 
     try {
-      for (let i = 0; i < updatedInstances.length; i++) {
+      // Use Promise.all to make all requests in parallel
+      const statusPromises = updatedInstances.map(async (instance, index) => {
         try {
-          const response = await getInstanceStatus(updatedInstances[i].instanceId)
-          if (response.success) {
-            const newStatus = response.status === "running"
-            if (updatedInstances[i].status !== newStatus) {
-              updatedInstances[i].status = newStatus
+          // Add cache-busting parameter to prevent stale responses
+          const timestamp = new Date().getTime()
+          const response = await fetch(`/api/instances/${instance.instanceId}/status?t=${timestamp}`, {
+            method: "GET",
+            cache: "no-store",
+            headers: {
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
+            },
+          })
+
+          if (!response.ok) throw new Error(`Status check failed: ${response.statusText}`)
+
+          const data = await response.json()
+          if (data.success) {
+            const newStatus = data.status === "running"
+            if (updatedInstances[index].status !== newStatus) {
+              updatedInstances[index].status = newStatus
               hasChanges = true
             }
           }
         } catch (error) {
-          console.error(`Failed to refresh status for instance ${updatedInstances[i].id}:`, error)
+          console.error(`Failed to refresh status for instance ${updatedInstances[index].id}:`, error)
         }
-      }
+      })
+
+      await Promise.all(statusPromises)
 
       if (hasChanges) {
         setInstances(updatedInstances)
