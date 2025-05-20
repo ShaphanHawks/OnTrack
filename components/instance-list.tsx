@@ -160,31 +160,31 @@ export function InstanceList() {
   }
 
   if (isLoading) {
-    return <div className="text-center py-8">Loading instances...</div>
+    return <div className="text-center py-4 text-sm">Loading instances...</div>
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Your GPU Instances</h2>
+        <h2 className="text-lg font-medium">Your Instances</h2>
         <Button
           variant="outline"
           size="sm"
           onClick={() => refreshAllStatuses()}
           disabled={isRefreshing || instances.length === 0}
-          className="flex items-center gap-2"
+          className="flex items-center gap-1 h-7 text-xs"
         >
-          <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+          <RefreshCw className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`} />
           Refresh All
         </Button>
       </div>
 
       {instances.length === 0 ? (
-        <div className="text-center py-8 border rounded-lg bg-white dark:bg-gray-800">
-          <p className="text-muted-foreground">No instances added yet. Add your first GPU instance above.</p>
+        <div className="text-center py-4 border rounded-lg bg-white dark:bg-gray-800">
+          <p className="text-sm text-muted-foreground">No instances added yet.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {instances.map((instance) => (
             <InstanceCard
               key={instance.id}

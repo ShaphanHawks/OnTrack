@@ -2,13 +2,14 @@
 
 import { useState } from "react"
 import { Trash2, Power, RefreshCw } from "lucide-react"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { Instance } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { startInstance, stopInstance } from "@/lib/tensordock-api"
 import { toast } from "@/components/ui/use-toast"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface InstanceCardProps {
   instance: Instance
@@ -109,75 +110,85 @@ export function InstanceCard({ instance, onDelete, onStatusChange }: InstanceCar
   const statusEmoji = instance.status ? "💻" : "🖥️"
 
   return (
-    <Card
-      className={cn(
-        "transition-all duration-200",
-        instance.status ? "border-green-200 dark:border-green-900" : "border-red-200 dark:border-red-900",
-      )}
-    >
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl" role="img" aria-label="Computer">
-              {statusEmoji}
-            </span>
-            <CardTitle>{instance.friendlyName}</CardTitle>
-          </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleRefreshStatus}
-              disabled={isRefreshing || isTogglingPower || isDeleting}
-              className="h-8 w-8 text-gray-500 hover:text-gray-700"
-            >
-              <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
-              <span className="sr-only">Refresh Status</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleDelete}
-              disabled={isDeleting || isTogglingPower}
-              className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
-            >
-              <Trash2 className="h-4 w-4" />
-              <span className="sr-only">Delete</span>
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          <div className="text-sm text-muted-foreground">ID: {instance.instanceId}</div>
-          <div className="flex items-center gap-2">
-            <Badge
-              variant={instance.status ? "default" : "outline"}
-              className={
-                instance.status ? "bg-green-500 hover:bg-green-600" : "text-red-500 border-red-200 dark:border-red-800"
-              }
-            >
-              {instance.status ? "Online" : "Offline"}
-            </Badge>
-            {powerMessage && (
-              <span className={cn("text-xs", powerWarning ? "text-amber-500" : "text-muted-foreground")}>
-                {powerMessage}
+    <TooltipProvider>
+      <Card
+        className={cn(
+          "transition-all duration-200",
+          instance.status ? "border-green-200 dark:border-green-900" : "border-red-200 dark:border-red-900",
+        )}
+      >
+        <CardContent className="p-3">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <span className="text-xl" role="img" aria-label="Computer">
+                {statusEmoji}
               </span>
-            )}
+              <div>
+                <h3 className="font-medium text-sm">{instance.friendlyName}</h3>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <p className="text-xs text-muted-foreground truncate max-w-[120px]">{instance.instanceId}</p>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">{instance.instanceId}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <Badge
+                variant={instance.status ? "default" : "outline"}
+                className={cn(
+                  "text-xs px-1.5 h-5",
+                  instance.status
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "text-red-500 border-red-200 dark:border-red-800",
+                )}
+              >
+                {instance.status ? "Online" : "Offline"}
+              </Badge>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleRefreshStatus}
+                disabled={isRefreshing || isTogglingPower || isDeleting}
+                className="h-6 w-6 text-gray-500 hover:text-gray-700"
+              >
+                <RefreshCw className={cn("h-3 w-3", isRefreshing && "animate-spin")} />
+                <span className="sr-only">Refresh Status</span>
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleDelete}
+                disabled={isDeleting || isTogglingPower}
+                className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+              >
+                <Trash2 className="h-3 w-3" />
+                <span className="sr-only">Delete</span>
+              </Button>
+            </div>
           </div>
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button
-          onClick={handleTogglePower}
-          disabled={isTogglingPower || isDeleting}
-          variant={instance.status ? "destructive" : "default"}
-          className={cn("w-full", instance.status ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600")}
-        >
-          <Power className="mr-2 h-4 w-4" />
-          {isTogglingPower ? "Processing..." : instance.status ? "Turn Off" : "Turn On"}
-        </Button>
-      </CardFooter>
-    </Card>
+        </CardContent>
+        <CardFooter className="p-2 pt-0">
+          <Button
+            onClick={handleTogglePower}
+            disabled={isTogglingPower || isDeleting}
+            variant={instance.status ? "destructive" : "default"}
+            size="sm"
+            className={cn(
+              "w-full text-xs h-7",
+              instance.status ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600",
+            )}
+          >
+            <Power className="mr-1 h-3 w-3" />
+            {isTogglingPower ? "Processing..." : instance.status ? "Turn Off" : "Turn On"}
+          </Button>
+        </CardFooter>
+      </Card>
+    </TooltipProvider>
   )
 }

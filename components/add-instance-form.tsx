@@ -7,7 +7,7 @@ import { PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
 import { v4 as uuidv4 } from "uuid"
 import { getInstanceStatus } from "@/lib/tensordock-api"
@@ -110,45 +110,47 @@ export function AddInstanceForm() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Add New GPU Instance</CardTitle>
+    <Card className="shadow-sm">
+      <CardHeader className="p-3 pb-0">
+        <CardTitle className="text-base">Add New Instance</CardTitle>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="friendlyName">Friendly Name</Label>
-            <Input
-              id="friendlyName"
-              placeholder="My GPU Server"
-              value={friendlyName}
-              onChange={(e) => setFriendlyName(e.target.value)}
-              disabled={isSubmitting}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="instanceId">TensorDock Instance ID</Label>
-            <Input
-              id="instanceId"
-              placeholder="instance_123456"
-              value={instanceId}
-              onChange={(e) => setInstanceId(e.target.value)}
-              disabled={isSubmitting}
-            />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? (
-              "Adding..."
-            ) : (
-              <>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Machine
-              </>
-            )}
-          </Button>
-        </CardFooter>
+      <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-2 p-3">
+        <div className="flex-1">
+          <Label htmlFor="friendlyName" className="sr-only">
+            Friendly Name
+          </Label>
+          <Input
+            id="friendlyName"
+            placeholder="Friendly Name"
+            value={friendlyName}
+            onChange={(e) => setFriendlyName(e.target.value)}
+            disabled={isSubmitting}
+            className="h-8 text-sm"
+          />
+        </div>
+        <div className="flex-1">
+          <Label htmlFor="instanceId" className="sr-only">
+            TensorDock Instance ID
+          </Label>
+          <Input
+            id="instanceId"
+            placeholder="Instance ID"
+            value={instanceId}
+            onChange={(e) => setInstanceId(e.target.value)}
+            disabled={isSubmitting}
+            className="h-8 text-sm"
+          />
+        </div>
+        <Button type="submit" disabled={isSubmitting} size="sm" className="h-8">
+          {isSubmitting ? (
+            "Adding..."
+          ) : (
+            <>
+              <PlusCircle className="mr-1 h-3 w-3" />
+              Add
+            </>
+          )}
+        </Button>
       </form>
     </Card>
   )

@@ -47,7 +47,7 @@ export function ApiStatusIndicator() {
   return (
     <TooltipProvider>
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium">TensorDock API</span>
+        <span className="text-sm font-medium">API Status</span>
         {status === "loading" ? (
           <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
         ) : status === "connected" ? (
@@ -59,7 +59,7 @@ export function ApiStatusIndicator() {
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>TensorDock API is connected and working properly</p>
+              <p>API is connected and working properly</p>
               {lastChecked && (
                 <p className="text-xs text-muted-foreground">Last checked: {lastChecked.toLocaleTimeString()}</p>
               )}
@@ -74,7 +74,7 @@ export function ApiStatusIndicator() {
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Unable to connect to TensorDock API</p>
+              <p>Unable to connect to API</p>
               {errorMessage && <p className="text-xs text-red-400 mt-1">{errorMessage}</p>}
               <p className="text-xs text-muted-foreground mt-1">
                 Check your API key and verify it has the correct permissions

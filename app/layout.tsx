@@ -7,8 +7,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "TensorDock Dashboard",
-  description: "Manage your TensorDock GPU instances in one place",
+  title: "Utility Tools",
+  description: "Manage your GPU instances and other utilities in one place",
     generator: 'v0.dev'
 }
 
