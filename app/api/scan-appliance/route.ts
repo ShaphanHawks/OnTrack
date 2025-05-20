@@ -27,8 +27,9 @@ export async function POST(request: Request) {
     // Convert the file to a byte array
     const imageBytes = await imageFile.arrayBuffer()
 
-    // Create a model instance - using Gemini 1.0 Pro Vision which is designed for image + text tasks
-    const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro-vision" })
+    // Create a model instance - using the correct model name format
+    // The correct format is "gemini-pro-vision" (not "gemini-1.0-pro-vision")
+    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" })
 
     // Prepare the image for the API
     const imageData = [...new Uint8Array(imageBytes)]
