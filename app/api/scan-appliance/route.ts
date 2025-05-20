@@ -20,20 +20,20 @@ export async function POST(request: Request) {
 
     console.log("Image received:", imageFile.name, imageFile.type, imageFile.size)
 
-    // Convert the file to a byte array
-    const imageBytes = await imageFile.arrayBuffer()
-    const base64Image = Buffer.from(imageBytes).toString("base64")
+    // Convert the file to a base64 string
+    const arrayBuffer = await imageFile.arrayBuffer()
+    const base64Image = Buffer.from(arrayBuffer).toString("base64")
 
-    // Direct API call to Gemini 1.5 Flash
+    // Using gemini-1.5-flash model as in the working example
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
 
-    // Prepare the request payload
-    const payload = {
+    // Match the exact request structure from the working example
+    const requestBody = {
       contents: [
         {
           parts: [
             {
-              text: "Please extract and return ONLY the model number and serial number from this appliance tag image. Format your response exactly like this example:\nModel: ABC123\nSerial: XYZ789\nIf you can't find one or both numbers, indicate with 'Not found'.",
+              text: "From the following image of an appliance model tag, please extract the Model Number and the Serial Number. Clearly label them.",
             },
             {
               inline_data: {
@@ -44,6 +44,10 @@ export async function POST(request: Request) {
           ],
         },
       ],
+      generationConfig: {
+        temperature: 0.2,
+        maxOutputTokens: 256,
+      },
     }
 
     console.log("Sending request to Gemini API...")
@@ -54,55 +58,65 @@ export async function POST(request: Request) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(requestBody),
     })
 
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error("Gemini API error:", response.status, errorText)
+      const errorData = await response.json().catch(() => ({}))
+      console.error("API Error:", errorData)
       return NextResponse.json(
         {
           success: false,
-          error: `Gemini API error: ${response.status} ${response.statusText}. Details: ${errorText}`,
+          error: `API request failed: ${response.status} ${response.statusText}. ${errorData.error?.message || ""}`,
         },
         { status: 500 },
       )
     }
 
     const data = await response.json()
-    console.log("Gemini API response:", JSON.stringify(data))
+    console.log("API Response:", data)
 
-    // Extract the text from the response
-    let text = ""
     if (
       data.candidates &&
-      data.candidates[0] &&
+      data.candidates.length > 0 &&
       data.candidates[0].content &&
       data.candidates[0].content.parts &&
-      data.candidates[0].content.parts[0] &&
-      data.candidates[0].content.parts[0].text
+      data.candidates[0].content.parts.length > 0
     ) {
-      text = data.candidates[0].content.parts[0].text
+      const extractedText = data.candidates[0].content.parts[0].text
+      console.log("Extracted text:", extractedText)
+
+      // Parse the model and serial numbers from the response
+      let modelNumber = "Not found"
+      let serialNumber = "Not found"
+
+      // Try to find "Model Number:" or "Model:" (case-insensitive)
+      const modelMatch =
+        extractedText.match(/Model Number[:\s]+([\w-]+)/i) || extractedText.match(/Model[:\s]+([\w-]+)/i)
+      if (modelMatch && modelMatch[1]) {
+        modelNumber = modelMatch[1]
+      }
+
+      // Try to find "Serial Number:" or "S/N:" or "Serial:" (case-insensitive)
+      const serialMatch =
+        extractedText.match(/Serial Number[:\s]+([\w-]+)/i) ||
+        extractedText.match(/S\/N[:\s]+([\w-]+)/i) ||
+        extractedText.match(/Serial[:\s]+([\w-]+)/i)
+      if (serialMatch && serialMatch[1]) {
+        serialNumber = serialMatch[1]
+      }
+
+      console.log("Extracted model:", modelNumber, "serial:", serialNumber)
+
+      return NextResponse.json({
+        success: true,
+        modelNumber,
+        serialNumber,
+        fullText: extractedText,
+      })
     } else {
-      return NextResponse.json({ success: false, error: "Unexpected response format from Gemini API" }, { status: 500 })
+      throw new Error("No content found in Gemini response or unexpected response structure.")
     }
-
-    console.log("Extracted text:", text)
-
-    // Parse the model and serial numbers from the response
-    const modelMatch = text.match(/Model:?\s*([^\n]+)/i)
-    const serialMatch = text.match(/Serial:?\s*([^\n]+)/i)
-
-    const modelNumber = modelMatch ? modelMatch[1].trim() : "Not found"
-    const serialNumber = serialMatch ? serialMatch[1].trim() : "Not found"
-
-    console.log("Extracted model:", modelNumber, "serial:", serialNumber)
-
-    return NextResponse.json({
-      success: true,
-      modelNumber,
-      serialNumber,
-    })
   } catch (error) {
     console.error("Error processing image:", error)
     return NextResponse.json(

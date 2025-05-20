@@ -16,6 +16,7 @@ export function ApplianceScanner() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [modelNumber, setModelNumber] = useState<string | null>(null)
   const [serialNumber, setSerialNumber] = useState<string | null>(null)
+  const [fullText, setFullText] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
@@ -28,6 +29,7 @@ export function ApplianceScanner() {
     setError(null)
     setModelNumber(null)
     setSerialNumber(null)
+    setFullText(null)
 
     // Check if file is an image
     if (!file.type.startsWith("image/")) {
@@ -77,6 +79,7 @@ export function ApplianceScanner() {
       if (data.success) {
         setModelNumber(data.modelNumber || "Not found")
         setSerialNumber(data.serialNumber || "Not found")
+        setFullText(data.fullText || "")
       } else {
         throw new Error(data.error || "Failed to extract information")
       }
@@ -215,6 +218,13 @@ export function ApplianceScanner() {
                       </Button>
                     )}
                   </div>
+
+                  {fullText && (
+                    <div className="mt-3 p-2 bg-muted/30 rounded-md">
+                      <p className="text-xs text-muted-foreground mb-1">Full AI Response:</p>
+                      <p className="text-xs whitespace-pre-wrap">{fullText}</p>
+                    </div>
+                  )}
                 </>
               )}
             </div>
