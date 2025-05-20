@@ -9,11 +9,11 @@ export default function Dashboard() {
         <DashboardHeader />
 
         <div className="mt-8">
-          <AddInstanceForm />
+          <InstanceList />
         </div>
 
         <div className="mt-8">
-          <InstanceList />
+          <AddInstanceForm />
         </div>
       </div>
     </div>
