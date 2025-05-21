@@ -340,6 +340,20 @@ export function ApplianceScanner() {
                   </div>
                 </div>
               )}
+              {/* Start Over Button */}
+              <Button
+                variant="outline"
+                className="w-full mt-2"
+                onClick={() => {
+                  setImagePreview(null);
+                  setModelNumber(null);
+                  setSerialNumber(null);
+                  setError(null);
+                }}
+                disabled={isProcessing || (!imagePreview && !modelNumber && !serialNumber && !error)}
+              >
+                Start Over
+              </Button>
             </div>
           </div>
         </div>
