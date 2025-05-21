@@ -270,25 +270,8 @@ export function ApplianceScanner() {
               </div>
             </div>
 
-            {/* Only keep the upload button, remove paste button */}
-            <Button onClick={handleUploadClick} disabled={isUploading || isProcessing} className="w-full mt-2" size="sm">
-              {isUploading ? (
-                <>
-                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Upload className="mr-1 h-3 w-3" />
-                  Upload File
-                </>
-              )}
-            </Button>
-
             {/* Moved Extracted Information section here */}
             <div className="space-y-2 mt-4 w-full">
-              <p className="text-sm font-medium">Extracted Information:</p>
-
               {error && (
                 <Alert variant="destructive" className="py-2">
                   <AlertCircle className="h-4 w-4" />
@@ -306,7 +289,7 @@ export function ApplianceScanner() {
                   <div className="flex items-center justify-between bg-muted/50 p-2 rounded-md">
                     <div className="w-full">
                       <p className="text-xs text-muted-foreground">Model Number:</p>
-                      <p className="text-sm font-medium">{modelNumber || "Upload an image to extract"}</p>
+                      <p className="text-sm font-medium">{modelNumber || ""}</p>
                     </div>
                     {modelNumber && modelNumber !== "Not found" && (
                       <Button
@@ -324,7 +307,7 @@ export function ApplianceScanner() {
                   <div className="flex items-center justify-between bg-muted/50 p-2 rounded-md">
                     <div className="w-full">
                       <p className="text-xs text-muted-foreground">Serial Number:</p>
-                      <p className="text-sm font-medium">{serialNumber || "Upload an image to extract"}</p>
+                      <p className="text-sm font-medium">{serialNumber || ""}</p>
                     </div>
                     {serialNumber && serialNumber !== "Not found" && (
                       <Button
