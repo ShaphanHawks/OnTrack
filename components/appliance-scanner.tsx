@@ -342,8 +342,8 @@ export function ApplianceScanner() {
               )}
               {/* Start Over Button */}
               <Button
-                variant="outline"
                 className="w-full mt-2"
+                size="sm"
                 onClick={() => {
                   setImagePreview(null);
                   setModelNumber(null);
