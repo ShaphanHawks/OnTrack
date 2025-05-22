@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/theme-provider"
 import HamburgerMenu from "@/components/hamburger-menu"
+import Link from "next/link"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,6 +24,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <div className="relative min-h-screen flex flex-col">
+            {/* Masthead */}
+            <header className="w-full py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex justify-center items-center z-50">
+              <Link href="/" className="text-2xl font-bold text-center text-gray-900 dark:text-white hover:underline">
+                Utility Tools
+              </Link>
+            </header>
             {/* Hamburger Menu */}
             <HamburgerMenu />
             {/* Main Content */}
