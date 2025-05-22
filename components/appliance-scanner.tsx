@@ -270,74 +270,7 @@ export function ApplianceScanner() {
               </div>
             </div>
 
-            {/* Moved Extracted Information section here */}
-            <div className="space-y-2 mt-4 w-full">
-              {error && (
-                <Alert variant="destructive" className="py-2">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription className="text-xs ml-2">{error}</AlertDescription>
-                </Alert>
-              )}
-
-              {isProcessing ? (
-                <div className="flex items-center justify-center h-20">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                  <span className="ml-2 text-sm text-muted-foreground">Processing image...</span>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between bg-muted/50 p-2 rounded-md">
-                    <div className="w-full">
-                      <p className="text-xs text-muted-foreground">Model Number:</p>
-                      <p className="text-sm font-medium">{modelNumber || ""}</p>
-                    </div>
-                    {modelNumber && modelNumber !== "Not found" && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 ml-2 flex-shrink-0"
-                        onClick={() => copyToClipboard(modelNumber, "Model number")}
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                        <span className="sr-only">Copy model number</span>
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between bg-muted/50 p-2 rounded-md">
-                    <div className="w-full">
-                      <p className="text-xs text-muted-foreground">Serial Number:</p>
-                      <p className="text-sm font-medium">{serialNumber || ""}</p>
-                    </div>
-                    {serialNumber && serialNumber !== "Not found" && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 ml-2 flex-shrink-0"
-                        onClick={() => copyToClipboard(serialNumber, "Serial number")}
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                        <span className="sr-only">Copy serial number</span>
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )}
-              {/* Start Over Button */}
-              <Button
-                className="w-full mt-2"
-                size="sm"
-                onClick={() => {
-                  setImagePreview(null);
-                  setModelNumber(null);
-                  setSerialNumber(null);
-                  setError(null);
-                }}
-                disabled={isProcessing || (!imagePreview && !modelNumber && !serialNumber && !error)}
-              >
-                Start Over
-              </Button>
-            </div>
+            {/* Removed Extracted Information section and related logic as it is no longer needed. */}
           </div>
         </div>
       </CardContent>
