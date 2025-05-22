@@ -48,6 +48,15 @@ export function ApplianceScanner() {
       if (data.success) {
         setModelNumber(data.modelNumber || "Not found")
         setSerialNumber(data.serialNumber || "Not found")
+        // Save to localStorage scan history
+        const scanResult = {
+          modelNumber: data.modelNumber || "Not found",
+          serialNumber: data.serialNumber || "Not found",
+          date: Date.now(),
+        };
+        let history = JSON.parse(localStorage.getItem("scanHistory") || "[]");
+        history.push(scanResult);
+        localStorage.setItem("scanHistory", JSON.stringify(history));
       } else {
         throw new Error(data.error || "Failed to extract information")
       }
