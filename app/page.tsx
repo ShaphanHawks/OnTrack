@@ -1,6 +1,5 @@
 import { DashboardHeader } from "@/components/dashboard-header"
 import { ApplianceScanner } from "@/components/appliance-scanner"
-import { InstancesModule } from "@/components/instances-module"
 
 export default function Dashboard() {
   return (
@@ -10,10 +9,6 @@ export default function Dashboard() {
 
         <div className="mt-4">
           <ApplianceScanner />
-        </div>
-
-        <div className="mt-4">
-          <InstancesModule />
         </div>
       </div>
     </div>
