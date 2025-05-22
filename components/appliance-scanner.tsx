@@ -271,6 +271,61 @@ export function ApplianceScanner() {
             </div>
 
             {/* Removed Extracted Information section and related logic as it is no longer needed. */}
+
+            {isProcessing ? (
+              <div className="flex items-center justify-center h-20">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                <span className="ml-2 text-sm text-muted-foreground">Processing image...</span>
+              </div>
+            ) : (
+              <>
+                {modelNumber && (
+                  <div className="flex items-center gap-2 w-full">
+                    <p className="text-sm font-medium">Model Number:</p>
+                    <p className="text-sm">{modelNumber}</p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => copyToClipboard(modelNumber, "Model number")}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+                {serialNumber && (
+                  <div className="flex items-center gap-2 w-full">
+                    <p className="text-sm font-medium">Serial Number:</p>
+                    <p className="text-sm">{serialNumber}</p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => copyToClipboard(serialNumber, "Serial number")}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Start Over Button */}
+            {(imagePreview || modelNumber || serialNumber || error) && (
+              <Button
+                className="w-full mt-2"
+                size="sm"
+                onClick={() => {
+                  setImagePreview(null);
+                  setModelNumber(null);
+                  setSerialNumber(null);
+                  setError(null);
+                }}
+                disabled={isProcessing}
+              >
+                Start Over
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>
