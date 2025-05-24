@@ -10,7 +10,11 @@ import { useToast } from "@/components/ui/use-toast"
 import Image from "next/image"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
-export function ApplianceScanner() {
+interface ApplianceScannerProps {
+  onModelNumberChange: (modelNumber: string) => void
+}
+
+export function ApplianceScanner({ onModelNumberChange }: ApplianceScannerProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -26,6 +30,7 @@ export function ApplianceScanner() {
     setError(null)
     setModelNumber(null)
     setSerialNumber(null)
+    onModelNumberChange("")
   }
 
   // Process image data (common function for both upload and paste)
@@ -46,11 +51,13 @@ export function ApplianceScanner() {
       const data = await response.json()
 
       if (data.success) {
-        setModelNumber(data.modelNumber || "Not found")
+        const newModelNumber = data.modelNumber || "Not found"
+        setModelNumber(newModelNumber)
         setSerialNumber(data.serialNumber || "Not found")
+        onModelNumberChange(newModelNumber)
         // Save to localStorage scan history
         const scanResult = {
-          modelNumber: data.modelNumber || "Not found",
+          modelNumber: newModelNumber,
           serialNumber: data.serialNumber || "Not found",
           date: Date.now(),
         };

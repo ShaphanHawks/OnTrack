@@ -40,6 +40,13 @@ export default function HamburgerMenu() {
               >
                 History
               </Link>
+              <Link 
+                href="/lookup" 
+                className="text-lg hover:text-blue-600 dark:hover:text-blue-400"
+                onClick={() => setIsOpen(false)}
+              >
+                Lookup
+              </Link>
             </nav>
           </div>
         </div>
