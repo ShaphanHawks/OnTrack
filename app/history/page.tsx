@@ -3,13 +3,19 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Copy } from "lucide-react"
 
+interface ScanHistoryItem {
+  date: number
+  modelNumber: string
+  serialNumber: string
+}
+
 function formatDate(dateNum: number) {
   const d = new Date(dateNum)
-  return d.toLocaleString()
+  return `${d.getMonth() + 1}/${d.getFullYear().toString().slice(-2)}`
 }
 
 export default function HistoryPage() {
-  const [history, setHistory] = useState([])
+  const [history, setHistory] = useState<ScanHistoryItem[]>([])
 
   useEffect(() => {
     const saved = localStorage.getItem("scanHistory")
@@ -53,7 +59,7 @@ export default function HistoryPage() {
             </tr>
           </thead>
           <tbody>
-            {limitedHistory.map((item: any, i: number) => (
+            {limitedHistory.map((item: ScanHistoryItem, i: number) => (
               <tr key={i} className="border-b hover:bg-muted">
                 <td className="py-2">{formatDate(item.date)}</td>
                 <td className="py-2">{item.modelNumber}</td>
