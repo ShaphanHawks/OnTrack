@@ -2,18 +2,19 @@
 
 import { Button } from "@/components/ui/button"
 import { ExternalLink } from "lucide-react"
+import type { ReactElement } from "react"
 
 interface LookupsModuleProps {
   modelTag: string
 }
 
-export function LookupsModule({ modelTag }: LookupsModuleProps) {
+export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
   return (
     <div className="mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
       <h2 className="text-2xl font-bold mb-4">Lookups</h2>
       <div className="space-y-4">
         <a 
-          href={`https://www.searspartsdirect.com/search?q=${modelTag}`}
+          href={`https://www.searspartsdirect.com/search?q=${encodeURIComponent(modelTag)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="block"
@@ -24,7 +25,7 @@ export function LookupsModule({ modelTag }: LookupsModuleProps) {
           </Button>
         </a>
         <a 
-          href={`https://www.facebook.com/search/posts/?q=${modelTag}&filters=eyJyYc9hdXRob3I6MCI6IntcIm5hbWVcIjpcIm15X2dyb3Vw19hbmRfcGFnZXNcIn0ifQ`}
+          href={`https://www.facebook.com/search/posts?q=${encodeURIComponent(modelTag)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="block"
