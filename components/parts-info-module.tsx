@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input"
 import { ExternalLink, ChevronDown, ChevronRight } from "lucide-react"
 import type { ReactElement } from "react"
 
-const STORAGE_KEY = "partsInfoModuleOpen"
+const STORAGE_KEY = "partsReviewsModuleOpen"
 
-export function PartsInfoModule(): ReactElement {
+export function PartsReviewsModule(): ReactElement {
   const [partNumber, setPartNumber] = useState<string>("")
   const [submittedPartNumber, setSubmittedPartNumber] = useState<string>("")
   const [open, setOpen] = useState<boolean>(true)
@@ -40,7 +40,7 @@ export function PartsInfoModule(): ReactElement {
   return (
     <div className="max-w-xl mx-auto bg-white border-2 border-[#FAD9CC] rounded-lg p-4 shadow-sm">
       <div className="flex items-center justify-between mb-4 cursor-pointer" onClick={toggleOpen}>
-        <h2 className="text-lg font-semibold text-gray-800">Parts Info</h2>
+        <h2 className="text-lg font-semibold text-gray-800">Parts Reviews</h2>
         {open ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
       </div>
       
@@ -60,10 +60,62 @@ export function PartsInfoModule(): ReactElement {
           </form>
           
           {submittedPartNumber && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-md">
-              <p className="text-sm text-gray-600 text-center">
-                Search links will appear here for part number: {submittedPartNumber}
-              </p>
+            <div className="space-y-2">
+              <a 
+                href={`https://www.amazon.com/s?k=${encodeURIComponent(submittedPartNumber)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button variant="outline" className="w-full justify-between">
+                  Amazon
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </a>
+              <a 
+                href={`https://partsdr.com/model-number-search?query=${encodeURIComponent(submittedPartNumber)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button variant="outline" className="w-full justify-between">
+                  PartsDr
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </a>
+              <a 
+                href={`https://www.searspartsdirect.com/search?q=${encodeURIComponent(submittedPartNumber)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button variant="outline" className="w-full justify-between">
+                  SearsPartsDirect
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </a>
+              <a 
+                href={`https://www.appliancepartspros.com/search.aspx?p=${encodeURIComponent(submittedPartNumber)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button variant="outline" className="w-full justify-between">
+                  AppliancePartsPros
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </a>
+              <a 
+                href={`https://www.repairclinic.com/Shop-For-Parts?query=${encodeURIComponent(submittedPartNumber)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button variant="outline" className="w-full justify-between">
+                  Repair Clinic
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </a>
             </div>
           )}
         </div>
