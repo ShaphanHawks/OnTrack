@@ -25,13 +25,12 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <div className="relative min-h-screen flex flex-col">
             {/* Masthead */}
-            <header className="w-full py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex justify-center items-center z-50">
-              <Link href="/" className="text-2xl font-bold text-center text-gray-900 dark:text-white hover:underline">
+            <header className="w-full py-4 bg-white dark:bg-gray-900 flex justify-between items-center px-4">
+              <Link href="/" className="text-2xl font-bold text-gray-900 dark:text-white hover:underline">
                 Utility Tools
               </Link>
+              <HamburgerMenu />
             </header>
-            {/* Hamburger Menu */}
-            <HamburgerMenu />
             {/* Main Content */}
             <main className="flex-1 flex flex-col items-center justify-center">
               {children}
