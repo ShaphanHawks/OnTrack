@@ -69,6 +69,17 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
               <ExternalLink className="h-4 w-4" />
             </Button>
           </a>
+          <a 
+            href={`https://servicematters.com/en_US/search?query=${encodeURIComponent(modelTag)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <Button variant="outline" className="w-full justify-between">
+              Service Matters
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </a>
         </div>
       )}
     </div>

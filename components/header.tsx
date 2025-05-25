@@ -9,8 +9,11 @@ export default function Header() {
 
   return (
     <header className="bg-white w-full">
-      <div className="flex justify-between items-center px-4 py-3">
-        <div className="text-xl font-semibold">OnTrack Tools</div>
+      <div className="flex justify-between items-center px-4 py-3 relative">
+        <div className="w-10" /> {/* Spacer for balance */}
+        <Link href="/" className="text-xl font-semibold absolute left-1/2 transform -translate-x-1/2 hover:text-[#F26D4B] transition-colors">
+          OnTrack Tools
+        </Link>
 
         <button
           onClick={() => setIsOpen(!isOpen)}
