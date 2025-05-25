@@ -13,9 +13,9 @@ export default function Dashboard() {
       <div className="container mx-auto px-4 py-4">
         <DashboardHeader />
 
-        <div className="mt-4">
+        <div className="mt-4 space-y-4">
           <ApplianceScanner onModelNumberChange={setModelNumber} />
-          {modelNumber && <LookupsModule modelTag={modelNumber} />}
+          <LookupsModule modelTag={modelNumber || "Enter model number"} />
         </div>
       </div>
     </div>

@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-
 import { useState, useRef, useCallback } from "react"
 import { Upload, Copy, Loader2, AlertCircle, Clipboard } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -9,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import Image from "next/image"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface ApplianceScannerProps {
   onModelNumberChange: (modelNumber: string) => void
@@ -24,6 +24,7 @@ export function ApplianceScanner({ onModelNumberChange }: ApplianceScannerProps)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const pasteAreaRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
+  const isMobile = useIsMobile()
 
   // Reset states for new image processing
   const resetStates = () => {
@@ -60,10 +61,10 @@ export function ApplianceScanner({ onModelNumberChange }: ApplianceScannerProps)
           modelNumber: newModelNumber,
           serialNumber: data.serialNumber || "Not found",
           date: Date.now(),
-        };
-        let history = JSON.parse(localStorage.getItem("scanHistory") || "[]");
-        history.push(scanResult);
-        localStorage.setItem("scanHistory", JSON.stringify(history));
+        }
+        let history = JSON.parse(localStorage.getItem("scanHistory") || "[]")
+        history.push(scanResult)
+        localStorage.setItem("scanHistory", JSON.stringify(history))
       } else {
         throw new Error(data.error || "Failed to extract information")
       }
@@ -229,7 +230,7 @@ export function ApplianceScanner({ onModelNumberChange }: ApplianceScannerProps)
             <div className="w-full flex flex-col md:flex-row gap-2 items-center justify-center">
               {/* File Upload Area */}
               <div
-                className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-2 h-40 w-full md:w-64 cursor-pointer"
+                className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-2 h-40 w-full cursor-pointer"
                 onClick={handleUploadClick}
               >
                 {imagePreview ? (
@@ -258,35 +259,35 @@ export function ApplianceScanner({ onModelNumberChange }: ApplianceScannerProps)
                 />
               </div>
 
-              {/* Clipboard Paste Area - Simplified */}
-              <div
-                ref={pasteAreaRef}
-                className="flex flex-col items-center justify-center border border-input rounded-md p-2 h-40 w-full md:w-64 cursor-text bg-background"
-                onClick={handlePasteAreaClick}
-                tabIndex={0} // Make it focusable
-                onPaste={(e: React.ClipboardEvent) => handlePaste(e.nativeEvent)}
-              >
-                {imagePreview ? (
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={imagePreview || "/placeholder.svg"}
-                      alt="Appliance tag preview"
-                      fill
-                      className="object-contain"
-                      unoptimized
-                    />
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <Clipboard className="h-5 w-5 text-muted-foreground mb-1" />
-                    <p className="text-xs text-muted-foreground">Paste image here</p>
-                    <p className="text-xs text-muted-foreground">(Ctrl+V)</p>
-                  </div>
-                )}
-              </div>
+              {/* Clipboard Paste Area - Only show on desktop */}
+              {!isMobile && (
+                <div
+                  ref={pasteAreaRef}
+                  className="flex flex-col items-center justify-center border border-input rounded-md p-2 h-40 w-full md:w-64 cursor-text bg-background"
+                  onClick={handlePasteAreaClick}
+                  tabIndex={0}
+                  onPaste={(e: React.ClipboardEvent) => handlePaste(e.nativeEvent)}
+                >
+                  {imagePreview ? (
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={imagePreview || "/placeholder.svg"}
+                        alt="Appliance tag preview"
+                        fill
+                        className="object-contain"
+                        unoptimized
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <Clipboard className="h-5 w-5 text-muted-foreground mb-1" />
+                      <p className="text-xs text-muted-foreground">Paste image here</p>
+                      <p className="text-xs text-muted-foreground">(Ctrl+V)</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-
-            {/* Removed Extracted Information section and related logic as it is no longer needed. */}
 
             {isProcessing ? (
               <div className="flex items-center justify-center h-20">
@@ -332,10 +333,10 @@ export function ApplianceScanner({ onModelNumberChange }: ApplianceScannerProps)
                 className="w-full mt-2"
                 size="sm"
                 onClick={() => {
-                  setImagePreview(null);
-                  setModelNumber(null);
-                  setSerialNumber(null);
-                  setError(null);
+                  setImagePreview(null)
+                  setModelNumber(null)
+                  setSerialNumber(null)
+                  setError(null)
                 }}
                 disabled={isProcessing}
               >
