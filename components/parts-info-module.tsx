@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, ChangeEvent } from "react"
+import { useState, useEffect, ChangeEvent, FormEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ExternalLink, ChevronDown, ChevronRight } from "lucide-react"
@@ -10,6 +10,7 @@ const STORAGE_KEY = "partsInfoModuleOpen"
 
 export function PartsInfoModule(): ReactElement {
   const [partNumber, setPartNumber] = useState<string>("")
+  const [submittedPartNumber, setSubmittedPartNumber] = useState<string>("")
   const [open, setOpen] = useState<boolean>(true)
 
   // Load persisted state
@@ -27,12 +28,17 @@ export function PartsInfoModule(): ReactElement {
     setPartNumber(e.target.value)
   }
 
+  const handleSubmit = (e: FormEvent): void => {
+    e.preventDefault()
+    setSubmittedPartNumber(partNumber)
+  }
+
   const toggleOpen = (): void => {
     setOpen((prevOpen: boolean) => !prevOpen)
   }
 
   return (
-    <div className="max-w-xl mx-auto bg-white border border-[#FAD9CC] rounded-lg p-4 shadow-sm hover:shadow-md transition">
+    <div className="max-w-xl mx-auto bg-white border-2 border-[#FAD9CC] rounded-lg p-4 shadow-sm">
       <div className="flex items-center justify-between mb-4 cursor-pointer" onClick={toggleOpen}>
         <h2 className="text-lg font-semibold text-gray-800">Parts Info</h2>
         {open ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
@@ -40,49 +46,26 @@ export function PartsInfoModule(): ReactElement {
       
       {open && (
         <div className="space-y-4">
-          <Input
-            type="text"
-            placeholder="Enter part number"
-            value={partNumber}
-            onChange={handleInputChange}
-            className="w-full"
-          />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              type="text"
+              placeholder="Enter part number"
+              value={partNumber}
+              onChange={handleInputChange}
+              className="w-full"
+            />
+            <Button type="submit" className="w-full">
+              Search
+            </Button>
+          </form>
           
-          <div className="space-y-2">
-            <a 
-              href={`https://www.searspartsdirect.com/search?q=${encodeURIComponent(partNumber)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block"
-            >
-              <Button variant="outline" className="w-full justify-between">
-                SearsPartsDirect
-                <ExternalLink className="h-4 w-4" />
-              </Button>
-            </a>
-            <a 
-              href={`https://my.marcone.com/Home/RunSearchPartModelList?searchString=${encodeURIComponent(partNumber)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block"
-            >
-              <Button variant="outline" className="w-full justify-between">
-                Marcone
-                <ExternalLink className="h-4 w-4" />
-              </Button>
-            </a>
-            <a 
-              href={`https://appliantology.org/search/?&q=${encodeURIComponent(partNumber)}&quick=1&search_and_or=and&sortby=relevancy`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block"
-            >
-              <Button variant="outline" className="w-full justify-between">
-                Appliantology
-                <ExternalLink className="h-4 w-4" />
-              </Button>
-            </a>
-          </div>
+          {submittedPartNumber && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-md">
+              <p className="text-sm text-gray-600 text-center">
+                Search links will appear here for part number: {submittedPartNumber}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

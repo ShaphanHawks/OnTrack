@@ -37,6 +37,17 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
       {open && (
         <div className="space-y-2">
           <a 
+            href={`https://encompass.com/search?searchTerm=${encodeURIComponent(modelTag)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <Button variant="outline" className="w-full justify-between">
+              Encompass
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </a>
+          <a 
             href={`https://www.searspartsdirect.com/search?q=${encodeURIComponent(modelTag)}`}
             target="_blank"
             rel="noopener noreferrer"
