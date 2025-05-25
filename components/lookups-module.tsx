@@ -28,9 +28,9 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
   }, [open])
 
   return (
-    <div className="mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+    <div className="max-w-xl mx-auto bg-white border border-[#FAD9CC] rounded-lg p-4 shadow-sm hover:shadow-md transition">
       <div className="flex items-center justify-between mb-4 cursor-pointer" onClick={() => setOpen(o => !o)}>
-        <h2 className="text-2xl font-bold">Lookups</h2>
+        <h2 className="text-lg font-semibold text-gray-800">Lookups</h2>
         {open ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
       </div>
       
