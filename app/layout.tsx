@@ -3,8 +3,7 @@ import "@/app/globals.css"
 import { Inter } from "next/font/google"
 import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/theme-provider"
-import HamburgerMenu from "@/components/hamburger-menu"
-import Link from "next/link"
+import Header from "@/components/header"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -24,14 +23,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <div className="relative min-h-screen flex flex-col">
-            {/* Masthead */}
-            <header className="w-full py-4 bg-white dark:bg-gray-900 flex justify-between items-center px-4">
-              <Link href="/" className="text-2xl font-bold text-gray-900 dark:text-white hover:underline">
-                Utility Tools
-              </Link>
-              <HamburgerMenu />
-            </header>
-            {/* Main Content */}
+            <Header />
             <main className="flex-1 flex flex-col items-center justify-center">
               {children}
             </main>
