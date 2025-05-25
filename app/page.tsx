@@ -4,7 +4,7 @@ import { useState } from "react"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { ApplianceScanner } from "@/components/appliance-scanner"
 import { LookupsModule } from "@/components/lookups-module"
-import { PartsInfoModule } from "@/components/parts-info-module"
+import { PartsReviewsModule } from "@/components/parts-info-module"
 
 export default function Dashboard() {
   const [modelNumber, setModelNumber] = useState<string>("")
@@ -17,7 +17,7 @@ export default function Dashboard() {
         <div className="mt-4 space-y-4">
           <ApplianceScanner onModelNumberChange={setModelNumber} />
           <LookupsModule modelTag={modelNumber || "Enter model number"} />
-          <PartsInfoModule />
+          <PartsReviewsModule />
         </div>
       </div>
     </div>
