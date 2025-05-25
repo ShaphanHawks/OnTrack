@@ -23,9 +23,7 @@ export default function Header() {
 
       {isOpen && (
         <div className="absolute inset-0 bg-white z-40 px-6 py-20 flex flex-col space-y-6 text-lg">
-          <Link href="/scan" className="hover:text-[#F26D4B] transition-colors">Scan</Link>
           <Link href="/history" className="hover:text-[#F26D4B] transition-colors">History</Link>
-          <Link href="/lookup" className="hover:text-[#F26D4B] transition-colors">Lookup</Link>
         </div>
       )}
     </header>
