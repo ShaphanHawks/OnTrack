@@ -28,7 +28,7 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
   }, [open])
 
   return (
-    <div className="max-w-xl mx-auto bg-white border border-[#FAD9CC] rounded-lg p-4 shadow-sm hover:shadow-md transition">
+    <div className="max-w-xl mx-auto bg-white border-2 border-[#FAD9CC] rounded-lg p-4 shadow-sm">
       <div className="flex items-center justify-between mb-4 cursor-pointer" onClick={() => setOpen(o => !o)}>
         <h2 className="text-lg font-semibold text-gray-800">Lookups</h2>
         {open ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
@@ -36,6 +36,39 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
       
       {open && (
         <div className="space-y-2">
+          <a 
+            href={`https://partsdr.com/model-number-search?query=${encodeURIComponent(modelTag)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <Button variant="outline" className="w-full justify-between">
+              PartsDr
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </a>
+          <a 
+            href={`https://www.appliancepartspros.com/search.aspx?model=${encodeURIComponent(modelTag)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <Button variant="outline" className="w-full justify-between">
+              AppliancePartsPros
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </a>
+          <a 
+            href={`https://www.partselect.com/Models/${encodeURIComponent(modelTag)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <Button variant="outline" className="w-full justify-between">
+              PartsSelect
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </a>
           <a 
             href={`https://encompass.com/search?searchTerm=${encodeURIComponent(modelTag)}`}
             target="_blank"
