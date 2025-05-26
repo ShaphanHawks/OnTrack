@@ -30,8 +30,7 @@ const defaultProviders: LinkProvider[] = [
     method: 'POST',
     formAction: 'https://www.vvapplianceparts.com/lookup/',
     formFields: {
-      'searchForm': '{model}',
-      'q': '{model}'
+      'search': '{model}'
     },
     isFavorite: true
   },
