@@ -35,6 +35,12 @@ const defaultProviders: LinkProvider[] = [
     isFavorite: true
   },
   {
+    id: "manualslib",
+    name: "ManualsLib",
+    urlTemplate: "https://manualslib.com/{firstLetter}/{model}.html",
+    isFavorite: true
+  },
+  {
     id: "partsdr",
     name: "PartsDr",
     urlTemplate: "https://partsdr.com/model-number-search?query={model}",
@@ -141,6 +147,10 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
     let searchTerm = modelTag
     if (providerId === "appliantology") {
       searchTerm = modelTag.slice(0, 6) + "*"
+    }
+    if (providerId === "manualslib") {
+      const firstLetter = modelTag.charAt(0).toLowerCase()
+      return template.replace("{firstLetter}", firstLetter).replace("{model}", encodeURIComponent(searchTerm))
     }
     return template.replace("{model}", encodeURIComponent(searchTerm))
   }
