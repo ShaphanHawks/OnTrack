@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { ExternalLink, ChevronDown, ChevronRight, Settings } from "lucide-react"
+import { ExternalLink, ChevronDown, ChevronRight, Settings, CheckCircle2 } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import type { ReactElement } from "react"
 
@@ -100,6 +100,7 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
   const [open, setOpen] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   const [providers, setProviders] = useState<LinkProvider[]>(defaultProviders)
+  const [loadedProviders, setLoadedProviders] = useState<Set<string>>(new Set())
 
   // Load persisted states
   useEffect(() => {
@@ -176,7 +177,15 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
       document.body.appendChild(form)
       form.submit()
       document.body.removeChild(form)
+      
+      // Mark provider as loaded
+      setLoadedProviders(prev => new Set([...Array.from(prev), provider.id]))
     }
+  }
+
+  const handleLinkClick = (providerId: string) => {
+    // Mark provider as loaded when link is clicked
+    setLoadedProviders(prev => new Set([...Array.from(prev), providerId]))
   }
 
   return (
@@ -208,6 +217,7 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
                     onCheckedChange={() => toggleFavorite(provider.id)}
                     size="large"
                   />
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
                   {provider.method === 'POST' ? (
                     <a
                       href="#"
@@ -223,6 +233,7 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
                       href={getUrl(provider.urlTemplate, provider.id)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => handleLinkClick(provider.id)}
                       className="flex items-center gap-1 flex-1 text-lg font-semibold text-blue-600 underline"
                       style={{ minWidth: 0 }}
                     >
@@ -244,7 +255,10 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
                     className="w-full"
                   >
                     <Button variant="outline" className="w-full justify-between">
-                      {provider.name}
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        {provider.name}
+                      </div>
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   </button>
@@ -254,10 +268,14 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
                     href={getUrl(provider.urlTemplate, provider.id)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => handleLinkClick(provider.id)}
                     className="block"
                   >
                     <Button variant="outline" className="w-full justify-between">
-                      {provider.name}
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        {provider.name}
+                      </div>
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   </a>

@@ -1,0 +1,38 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.isAdmin == true;
+    }
+
+    // Helper function to check if user owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Helper function to check if request is from a Cloud Function
+    function isCloudFunction() {
+      return request.auth.token.firebase.sign_in_provider == 'custom';
+    }
+
+    // Scans collection rules
+    match /scans/{scanId} {
+      // Allow read if:
+      // 1. User is authenticated and owns the document
+      // 2. User is an admin
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+
+      // Allow write if:
+      // 1. User is authenticated and owns the document
+      // 2. Request is from a Cloud Function
+      allow write: if isOwner(request.resource.data.userId) || isCloudFunction();
+    }
+  }
+} 
