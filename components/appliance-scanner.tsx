@@ -285,7 +285,7 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
   const renderMobileUploadArea = () => {
     if (imagePreview) {
       return (
-        <div className="relative w-full h-40">
+        <div className="relative w-full aspect-square">
           <div className="relative w-full h-full">
             <Image
               src={imagePreview}
@@ -313,42 +313,26 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
     }
 
     return (
-      <div className="flex flex-col w-full h-40">
-        {/* Camera Section */}
+      <div className="flex flex-col w-full aspect-square">
+        {/* Camera Zone - 45% height */}
         <div
-          className="flex-1 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
+          className="h-[45%] flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
           onClick={handleCameraClick}
         >
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-14 h-14 rounded-full bg-orange-500 flex items-center justify-center">
-              <Camera className="h-7 w-7 text-white" />
-            </div>
-            <p className="text-sm text-muted-foreground">Take Photo</p>
-          </div>
+          <Camera className="h-16 w-16 text-gray-400 opacity-70" />
         </div>
 
-        {/* Divider */}
-        <div className="flex items-center justify-center gap-2 py-2">
-          <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
-            <ChevronDown className="h-4 w-4 text-white" />
-          </div>
-          <span className="text-sm text-muted-foreground">Or</span>
-          <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
-            <ChevronUp className="h-4 w-4 text-white" />
-          </div>
+        {/* Divider Zone - 10% height */}
+        <div className="h-[10%] flex items-center justify-center">
+          <span className="text-lg font-bold text-gray-400">▼ Or ▲</span>
         </div>
 
-        {/* Upload Section */}
+        {/* Upload Zone - 45% height */}
         <div
-          className="flex-1 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
+          className="h-[45%] flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
           onClick={handleUploadClick}
         >
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-14 h-14 rounded-full bg-orange-500 flex items-center justify-center">
-              <Upload className="h-7 w-7 text-white" />
-            </div>
-            <p className="text-sm text-muted-foreground">Upload Image</p>
-          </div>
+          <Upload className="h-16 w-16 text-gray-400 opacity-70" />
         </div>
       </div>
     )
