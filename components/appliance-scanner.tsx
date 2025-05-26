@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useCallback, useEffect } from "react"
-import { Upload, Copy, Loader2, AlertCircle, Clipboard } from "lucide-react"
+import { Upload, Copy, Loader2, AlertCircle, Clipboard, Camera } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
@@ -23,6 +23,7 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
   const [serialNumber, setSerialNumber] = useState<string | null>(initialSerial || null)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
   const pasteAreaRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
   const isMobile = useIsMobile()
@@ -148,6 +149,44 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
     }
   }
 
+  // Handle camera capture
+  const handleCameraCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    resetStates()
+
+    // Check if file is an image
+    if (!file.type.startsWith("image/")) {
+      toast({
+        title: "Invalid file type",
+        description: "Please capture an image",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsUploading(true)
+
+    try {
+      // Create image preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
+
+      setIsUploading(false)
+
+      // Process the image
+      await processImageData(file, file.type)
+    } catch (error) {
+      console.error("Error handling camera capture:", error)
+      setIsUploading(false)
+      setError(error instanceof Error ? error.message : "Failed to process image")
+    }
+  }
+
   // Handle clipboard paste
   const handlePaste = useCallback(
     async (e: ClipboardEvent) => {
@@ -218,6 +257,11 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
     fileInputRef.current?.click()
   }
 
+  // Handle camera button click
+  const handleCameraClick = () => {
+    cameraInputRef.current?.click()
+  }
+
   // Handle paste area click
   const handlePasteAreaClick = () => {
     // Focus the paste area to make it ready for paste events
@@ -248,32 +292,52 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
           <div className="w-full flex flex-col gap-3 items-center">
             <div className="w-full flex flex-col md:flex-row gap-2 items-center justify-center">
               {/* File Upload Area */}
-              <div
-                className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-2 h-40 w-full cursor-pointer"
-                onClick={handleUploadClick}
-              >
-                {imagePreview ? (
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={imagePreview || "/placeholder.svg"}
-                      alt="Appliance tag preview"
-                      fill
-                      className="object-contain"
-                      unoptimized
-                    />
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <Upload className="h-6 w-6 text-muted-foreground mb-1" />
-                    <p className="text-xs text-muted-foreground">Upload Image</p>
-                    <p className="text-xs text-muted-foreground">PNG, JPG, JPEG</p>
-                  </div>
+              <div className="relative w-full">
+                <div
+                  className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-2 h-40 w-full cursor-pointer"
+                  onClick={handleUploadClick}
+                >
+                  {imagePreview ? (
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={imagePreview || "/placeholder.svg"}
+                        alt="Appliance tag preview"
+                        fill
+                        className="object-contain"
+                        unoptimized
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <Upload className="h-6 w-6 text-muted-foreground mb-1" />
+                      <p className="text-xs text-muted-foreground">Upload Image</p>
+                      <p className="text-xs text-muted-foreground">PNG, JPG, JPEG</p>
+                    </div>
+                  )}
+                </div>
+                {isMobile && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="absolute bottom-2 right-2 h-8 w-8"
+                    onClick={handleCameraClick}
+                  >
+                    <Camera className="h-4 w-4" />
+                  </Button>
                 )}
                 <input
                   type="file"
                   ref={fileInputRef}
                   onChange={handleFileChange}
                   accept="image/png, image/jpeg, image/jpg"
+                  className="hidden"
+                />
+                <input
+                  type="file"
+                  ref={cameraInputRef}
+                  onChange={handleCameraCapture}
+                  accept="image/*"
+                  capture="environment"
                   className="hidden"
                 />
               </div>
