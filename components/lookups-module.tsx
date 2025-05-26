@@ -217,7 +217,9 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
                     onCheckedChange={() => toggleFavorite(provider.id)}
                     size="large"
                   />
-                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  {loadedProviders.has(provider.id) && (
+                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  )}
                   {provider.method === 'POST' ? (
                     <a
                       href="#"
@@ -256,7 +258,9 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
                   >
                     <Button variant="outline" className="w-full justify-between">
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        {loadedProviders.has(provider.id) && (
+                          <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        )}
                         {provider.name}
                       </div>
                       <ExternalLink className="h-4 w-4" />
@@ -273,7 +277,9 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
                   >
                     <Button variant="outline" className="w-full justify-between">
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        {loadedProviders.has(provider.id) && (
+                          <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        )}
                         {provider.name}
                       </div>
                       <ExternalLink className="h-4 w-4" />
