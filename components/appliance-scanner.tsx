@@ -63,6 +63,9 @@ export function ApplianceScanner({ onModelNumberChange }: ApplianceScannerProps)
           date: Date.now(),
         }
         let history = JSON.parse(localStorage.getItem("scanHistory") || "[]")
+        // Remove any existing entries with the same model number
+        history = history.filter((item: any) => item.modelNumber !== newModelNumber)
+        // Add the new scan result
         history.push(scanResult)
         localStorage.setItem("scanHistory", JSON.stringify(history))
       } else {
