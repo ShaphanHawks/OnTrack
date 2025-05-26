@@ -68,6 +68,12 @@ const defaultProviders: LinkProvider[] = [
     name: "Service Matters",
     urlTemplate: "https://servicematters.com/en_US/search?query={model}",
     isFavorite: true
+  },
+  {
+    id: "reliableparts",
+    name: "Reliable Parts",
+    urlTemplate: "https://reliableparts.net/us/content/#/search/{model}",
+    isFavorite: true
   }
 ]
 
