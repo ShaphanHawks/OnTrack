@@ -110,8 +110,12 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
     ))
   }
 
-  const getUrl = (template: string) => {
-    return template.replace("{model}", encodeURIComponent(modelTag))
+  const getUrl = (template: string, providerId: string) => {
+    let searchTerm = modelTag
+    if (providerId === "appliantology") {
+      searchTerm = modelTag.slice(0, 6) + "*"
+    }
+    return template.replace("{model}", encodeURIComponent(searchTerm))
   }
 
   return (
@@ -149,7 +153,7 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
                     {provider.name}
                   </label>
                   <a
-                    href={getUrl(provider.urlTemplate)}
+                    href={getUrl(provider.urlTemplate, provider.id)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline text-sm"
@@ -165,7 +169,7 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
               .map(provider => (
                 <a
                   key={provider.id}
-                  href={getUrl(provider.urlTemplate)}
+                  href={getUrl(provider.urlTemplate, provider.id)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block"
