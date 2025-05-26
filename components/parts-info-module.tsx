@@ -47,6 +47,12 @@ const defaultProviders: LinkProvider[] = [
     name: "Repair Clinic",
     urlTemplate: "https://www.repairclinic.com/Shop-For-Parts?query={part}",
     isFavorite: true
+  },
+  {
+    id: "reliableparts",
+    name: "Reliable Parts",
+    urlTemplate: "https://reliableparts.net/us/content/#/search/{part}",
+    isFavorite: true
   }
 ]
 
