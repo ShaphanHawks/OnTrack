@@ -180,7 +180,7 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
   }
 
   return (
-    <div className={`max-w-xl mx-auto bg-white border-2 rounded-lg p-4 shadow-sm ${showSettings ? 'border-vivid-orange' : 'border-[#FAD9CC]'}`}>
+    <div className={`max-w-xl mx-auto bg-white border-4 rounded-lg p-4 shadow-md hover:shadow-lg transition ${showSettings ? 'border-orange-500' : 'border-orange-500'}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-semibold text-gray-800">Lookups</h2>
