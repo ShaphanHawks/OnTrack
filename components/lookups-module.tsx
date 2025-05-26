@@ -74,6 +74,12 @@ const defaultProviders: LinkProvider[] = [
     name: "Reliable Parts",
     urlTemplate: "https://reliableparts.net/us/content/#/search/{model}",
     isFavorite: true
+  },
+  {
+    id: "tribles",
+    name: "Tribles",
+    urlTemplate: "https://www.tribles.com/search?q={model}",
+    isFavorite: true
   }
 ]
 
