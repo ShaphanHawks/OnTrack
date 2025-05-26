@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { ApplianceScanner } from "@/components/appliance-scanner"
 import { LookupsModule } from "@/components/lookups-module"
@@ -8,6 +8,16 @@ import { PartsReviewsModule } from "@/components/parts-info-module"
 
 export default function Dashboard() {
   const [modelNumber, setModelNumber] = useState<string>("")
+
+  // Check for selected model from history on page load
+  useEffect(() => {
+    const selectedModel = localStorage.getItem("selectedModel")
+    if (selectedModel) {
+      setModelNumber(selectedModel)
+      // Clear the selected model from storage after using it
+      localStorage.removeItem("selectedModel")
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">

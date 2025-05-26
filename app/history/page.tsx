@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Copy } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface ScanHistoryItem {
   date: number
@@ -16,6 +17,7 @@ function formatDate(dateNum: number) {
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<ScanHistoryItem[]>([])
+  const router = useRouter()
 
   useEffect(() => {
     const saved = localStorage.getItem("scanHistory")
@@ -24,6 +26,13 @@ export default function HistoryPage() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
+  }
+
+  const handleModelClick = (modelNumber: string) => {
+    // Store the selected model in localStorage for the home page to use
+    localStorage.setItem("selectedModel", modelNumber)
+    // Navigate to home page
+    router.push("/")
   }
 
   // Show only the most recent 100 scans, most recent first
@@ -45,6 +54,7 @@ export default function HistoryPage() {
           Clear History
         </Button>
       )}
+      
       {limitedHistory.length === 0 ? (
         <p className="text-muted-foreground">No scan history found.</p>
       ) : (
@@ -62,7 +72,14 @@ export default function HistoryPage() {
             {limitedHistory.map((item: ScanHistoryItem, i: number) => (
               <tr key={i} className="border-b hover:bg-muted">
                 <td className="py-2">{formatDate(item.date)}</td>
-                <td className="py-2">{item.modelNumber}</td>
+                <td className="py-2">
+                  <button
+                    onClick={() => handleModelClick(item.modelNumber)}
+                    className="text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    {item.modelNumber}
+                  </button>
+                </td>
                 <td>
                   <Button size="icon" variant="ghost" onClick={() => copyToClipboard(item.modelNumber)}>
                     <Copy className="h-4 w-4" />
