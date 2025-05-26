@@ -16,11 +16,24 @@ const FAVORITES_KEY = "lookupsFavorites"
 interface LinkProvider {
   id: string
   name: string
-  urlTemplate: string
+  urlTemplate?: string
   isFavorite: boolean
+  method?: 'GET' | 'POST'
+  formAction?: string
+  formFields?: Record<string, string>
 }
 
 const defaultProviders: LinkProvider[] = [
+  {
+    id: "vvappliance",
+    name: "V&V Appliance Parts",
+    method: 'POST',
+    formAction: 'https://www.vvapplianceparts.com/lookup/',
+    formFields: {
+      'model': '{model}'
+    },
+    isFavorite: true
+  },
   {
     id: "partsdr",
     name: "PartsDr",
@@ -122,12 +135,38 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
     ))
   }
 
-  const getUrl = (template: string, providerId: string) => {
+  const getUrl = (template: string | undefined, providerId: string) => {
+    if (!template) return ''
     let searchTerm = modelTag
     if (providerId === "appliantology") {
       searchTerm = modelTag.slice(0, 6) + "*"
     }
     return template.replace("{model}", encodeURIComponent(searchTerm))
+  }
+
+  const handleProviderClick = (provider: LinkProvider) => {
+    if (provider.method === 'POST' && provider.formAction) {
+      // Create and submit a form for POST requests
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = provider.formAction
+      form.target = '_blank'
+
+      // Add form fields
+      if (provider.formFields) {
+        Object.entries(provider.formFields).forEach(([name, value]) => {
+          const input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = name
+          input.value = value.replace('{model}', encodeURIComponent(modelTag))
+          form.appendChild(input)
+        })
+      }
+
+      document.body.appendChild(form)
+      form.submit()
+      document.body.removeChild(form)
+    }
   }
 
   return (
@@ -164,14 +203,23 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
                   >
                     {provider.name}
                   </label>
-                  <a
-                    href={getUrl(provider.urlTemplate, provider.id)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline text-sm"
-                  >
-                    Test Link
-                  </a>
+                  {provider.method === 'POST' ? (
+                    <button
+                      onClick={() => handleProviderClick(provider)}
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      Test Link
+                    </button>
+                  ) : (
+                    <a
+                      href={getUrl(provider.urlTemplate, provider.id)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      Test Link
+                    </a>
+                  )}
                 </div>
               ))}
             </div>
@@ -179,18 +227,31 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
             providers
               .filter(p => p.isFavorite)
               .map(provider => (
-                <a
-                  key={provider.id}
-                  href={getUrl(provider.urlTemplate, provider.id)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
-                >
-                  <Button variant="outline" className="w-full justify-between">
-                    {provider.name}
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                </a>
+                provider.method === 'POST' ? (
+                  <button
+                    key={provider.id}
+                    onClick={() => handleProviderClick(provider)}
+                    className="w-full"
+                  >
+                    <Button variant="outline" className="w-full justify-between">
+                      {provider.name}
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </button>
+                ) : (
+                  <a
+                    key={provider.id}
+                    href={getUrl(provider.urlTemplate, provider.id)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <Button variant="outline" className="w-full justify-between">
+                      {provider.name}
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </a>
+                )
               ))
           )}
         </div>
