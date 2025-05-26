@@ -339,7 +339,7 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
   }
 
   return (
-    <Card className="max-w-xl mx-auto bg-white border-4 border-orange-500 rounded-lg p-4 shadow-md hover:shadow-lg transition">
+    <Card className="max-w-xl mx-auto bg-white border-2 border-orange-500 rounded-lg p-4 shadow-md hover:shadow-lg transition">
       <CardHeader className="p-0 pb-4">
         <CardTitle className="text-lg font-semibold text-gray-800">Appliance Model Tag Scanner</CardTitle>
       </CardHeader>
