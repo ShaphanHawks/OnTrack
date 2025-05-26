@@ -28,9 +28,10 @@ export default function HistoryPage() {
     navigator.clipboard.writeText(text)
   }
 
-  const handleModelClick = (modelNumber: string) => {
-    // Store the selected model in localStorage for the home page to use
+  const handleModelClick = (modelNumber: string, serialNumber: string) => {
+    // Store the selected model and serial in localStorage for the home page to use
     localStorage.setItem("selectedModel", modelNumber)
+    localStorage.setItem("selectedSerial", serialNumber)
     // Navigate to home page
     router.push("/")
   }
@@ -74,7 +75,7 @@ export default function HistoryPage() {
                 <td className="py-2">{formatDate(item.date)}</td>
                 <td className="py-2">
                   <button
-                    onClick={() => handleModelClick(item.modelNumber)}
+                    onClick={() => handleModelClick(item.modelNumber, item.serialNumber)}
                     className="text-blue-600 hover:text-blue-800 hover:underline"
                   >
                     {item.modelNumber}

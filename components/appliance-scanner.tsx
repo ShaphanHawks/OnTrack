@@ -1,7 +1,6 @@
 "use client"
 
-import React from "react"
-import { useState, useRef, useCallback } from "react"
+import React, { useState, useRef, useCallback, useEffect } from "react"
 import { Upload, Copy, Loader2, AlertCircle, Clipboard } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -12,19 +11,36 @@ import { useIsMobile } from "@/hooks/use-mobile"
 
 interface ApplianceScannerProps {
   onModelNumberChange: (modelNumber: string) => void
+  initialModel?: string
+  initialSerial?: string
 }
 
-export function ApplianceScanner({ onModelNumberChange }: ApplianceScannerProps) {
+export function ApplianceScanner({ onModelNumberChange, initialModel, initialSerial }: ApplianceScannerProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [modelNumber, setModelNumber] = useState<string | null>(null)
-  const [serialNumber, setSerialNumber] = useState<string | null>(null)
+  const [modelNumber, setModelNumber] = useState<string | null>(initialModel || null)
+  const [serialNumber, setSerialNumber] = useState<string | null>(initialSerial || null)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const pasteAreaRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
   const isMobile = useIsMobile()
+
+  // Update model number when initialModel changes
+  useEffect(() => {
+    if (initialModel) {
+      setModelNumber(initialModel)
+      onModelNumberChange(initialModel)
+    }
+  }, [initialModel, onModelNumberChange])
+
+  // Update serial number when initialSerial changes
+  useEffect(() => {
+    if (initialSerial) {
+      setSerialNumber(initialSerial)
+    }
+  }, [initialSerial])
 
   // Reset states for new image processing
   const resetStates = () => {
