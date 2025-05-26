@@ -30,7 +30,8 @@ const defaultProviders: LinkProvider[] = [
     method: 'POST',
     formAction: 'https://www.vvapplianceparts.com/lookup/',
     formFields: {
-      'model': '{model}'
+      'searchForm': '{model}',
+      'q': '{model}'
     },
     isFavorite: true
   },
@@ -151,6 +152,7 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
       form.method = 'POST'
       form.action = provider.formAction
       form.target = '_blank'
+      form.id = 'searchForm'
 
       // Add form fields
       if (provider.formFields) {
@@ -159,9 +161,18 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
           input.type = 'hidden'
           input.name = name
           input.value = value.replace('{model}', encodeURIComponent(modelTag))
+          console.log(`Adding form field: ${name}=${input.value}`) // Debug log
           form.appendChild(input)
         })
       }
+
+      // Debug log the form before submission
+      console.log('Form action:', form.action)
+      console.log('Form method:', form.method)
+      console.log('Form ID:', form.id)
+      console.log('Form fields:', Array.from(form.elements).map(el => 
+        el instanceof HTMLInputElement ? `${el.name}=${el.value}` : ''
+      ))
 
       document.body.appendChild(form)
       form.submit()
