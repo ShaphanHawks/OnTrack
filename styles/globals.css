@@ -92,3 +92,8 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Vivid orange border for settings containers */
+.border-vivid-orange {
+  border-color: #F26D4B !important;
+}

@@ -115,7 +115,7 @@ export function PartsReviewsModule(): ReactElement {
   }
 
   return (
-    <div className="max-w-xl mx-auto bg-white border-2 border-[#FAD9CC] rounded-lg p-4 shadow-sm">
+    <div className={`max-w-xl mx-auto bg-white border-2 rounded-lg p-4 shadow-sm ${showSettings ? 'border-vivid-orange' : 'border-[#FAD9CC]'}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-semibold text-gray-800">Parts Reviews</h2>
@@ -151,25 +151,21 @@ export function PartsReviewsModule(): ReactElement {
               {showSettings ? (
                 <div className="space-y-2">
                   {providers.map(provider => (
-                    <div key={provider.id} className="flex items-center gap-2">
+                    <div key={provider.id} className="flex items-center gap-3">
                       <Checkbox
                         id={provider.id}
                         checked={provider.isFavorite}
                         onCheckedChange={() => toggleFavorite(provider.id)}
+                        size="large"
                       />
-                      <label
-                        htmlFor={provider.id}
-                        className="flex-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {provider.name}
-                      </label>
                       <a
                         href={getUrl(provider.urlTemplate)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline text-sm"
+                        className="flex-1 text-lg font-semibold text-blue-600 hover:underline"
+                        style={{ minWidth: 0 }}
                       >
-                        Test Link
+                        {provider.name}
                       </a>
                     </div>
                   ))}
