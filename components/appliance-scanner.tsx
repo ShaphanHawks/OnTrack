@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useCallback, useEffect } from "react"
-import { Upload, Copy, Loader2, AlertCircle, Clipboard, Camera } from "lucide-react"
+import { Upload, Copy, Loader2, AlertCircle, Clipboard, Camera, ChevronDown, ChevronUp } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
@@ -282,6 +282,78 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
     })
   }
 
+  const renderMobileUploadArea = () => {
+    if (imagePreview) {
+      return (
+        <div className="relative w-full h-40">
+          <div className="relative w-full h-full">
+            <Image
+              src={imagePreview}
+              alt="Appliance tag preview"
+              fill
+              className="object-contain rounded-md"
+              unoptimized
+            />
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="absolute bottom-2 right-2"
+            onClick={() => {
+              setImagePreview(null)
+              setModelNumber(null)
+              setSerialNumber(null)
+              setError(null)
+            }}
+          >
+            Replace
+          </Button>
+        </div>
+      )
+    }
+
+    return (
+      <div className="flex flex-col w-full h-40">
+        {/* Camera Section */}
+        <div
+          className="flex-1 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={handleCameraClick}
+        >
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-14 h-14 rounded-full bg-orange-500 flex items-center justify-center">
+              <Camera className="h-7 w-7 text-white" />
+            </div>
+            <p className="text-sm text-muted-foreground">Take Photo</p>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center justify-center gap-2 py-2">
+          <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
+            <ChevronDown className="h-4 w-4 text-white" />
+          </div>
+          <span className="text-sm text-muted-foreground">Or</span>
+          <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
+            <ChevronUp className="h-4 w-4 text-white" />
+          </div>
+        </div>
+
+        {/* Upload Section */}
+        <div
+          className="flex-1 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={handleUploadClick}
+        >
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-14 h-14 rounded-full bg-orange-500 flex items-center justify-center">
+              <Upload className="h-7 w-7 text-white" />
+            </div>
+            <p className="text-sm text-muted-foreground">Upload Image</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <Card className="max-w-xl mx-auto bg-white border border-[#FAD9CC] rounded-lg p-4 shadow-sm hover:shadow-md transition">
       <CardHeader className="p-0 pb-4">
@@ -293,37 +365,33 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
             <div className="w-full flex flex-col md:flex-row gap-2 items-center justify-center">
               {/* File Upload Area */}
               <div className="relative w-full">
-                <div
-                  className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-2 h-40 w-full cursor-pointer"
-                  onClick={handleUploadClick}
-                >
-                  {imagePreview ? (
-                    <div className="relative w-full h-full">
-                      <Image
-                        src={imagePreview || "/placeholder.svg"}
-                        alt="Appliance tag preview"
-                        fill
-                        className="object-contain"
-                        unoptimized
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-center">
-                      <Upload className="h-6 w-6 text-muted-foreground mb-1" />
-                      <p className="text-xs text-muted-foreground">Upload Image</p>
-                      <p className="text-xs text-muted-foreground">PNG, JPG, JPEG</p>
-                    </div>
-                  )}
-                </div>
-                {isMobile && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute bottom-2 right-2 h-8 w-8"
-                    onClick={handleCameraClick}
+                {isMobile ? (
+                  <div className="border-2 border-dashed rounded-md p-2">
+                    {renderMobileUploadArea()}
+                  </div>
+                ) : (
+                  <div
+                    className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-2 h-40 w-full cursor-pointer"
+                    onClick={handleUploadClick}
                   >
-                    <Camera className="h-4 w-4" />
-                  </Button>
+                    {imagePreview ? (
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={imagePreview || "/placeholder.svg"}
+                          alt="Appliance tag preview"
+                          fill
+                          className="object-contain"
+                          unoptimized
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-center">
+                        <Upload className="h-6 w-6 text-muted-foreground mb-1" />
+                        <p className="text-xs text-muted-foreground">Upload Image</p>
+                        <p className="text-xs text-muted-foreground">PNG, JPG, JPEG</p>
+                      </div>
+                    )}
+                  </div>
                 )}
                 <input
                   type="file"
