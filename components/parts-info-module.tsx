@@ -162,10 +162,11 @@ export function PartsReviewsModule(): ReactElement {
                         href={getUrl(provider.urlTemplate)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 text-lg font-semibold text-blue-600 hover:underline"
+                        className="flex items-center gap-1 flex-1 text-lg font-semibold text-blue-600 underline"
                         style={{ minWidth: 0 }}
                       >
                         {provider.name}
+                        <ExternalLink className="h-4 w-4" />
                       </a>
                     </div>
                   ))}

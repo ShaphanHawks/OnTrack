@@ -212,20 +212,22 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
                     <a
                       href="#"
                       onClick={e => { e.preventDefault(); handleProviderClick(provider); }}
-                      className="flex-1 text-lg font-semibold text-blue-600 hover:underline"
+                      className="flex items-center gap-1 flex-1 text-lg font-semibold text-blue-600 underline"
                       style={{ minWidth: 0 }}
                     >
                       {provider.name}
+                      <ExternalLink className="h-4 w-4" />
                     </a>
                   ) : (
                     <a
                       href={getUrl(provider.urlTemplate, provider.id)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 text-lg font-semibold text-blue-600 hover:underline"
+                      className="flex items-center gap-1 flex-1 text-lg font-semibold text-blue-600 underline"
                       style={{ minWidth: 0 }}
                     >
                       {provider.name}
+                      <ExternalLink className="h-4 w-4" />
                     </a>
                   )}
                 </div>
