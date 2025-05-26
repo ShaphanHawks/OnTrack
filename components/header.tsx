@@ -7,6 +7,10 @@ import Link from "next/link"
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
 
+  const handleLinkClick = () => {
+    setIsOpen(false)
+  }
+
   return (
     <header className="bg-white w-full">
       <div className="flex justify-between items-center px-4 py-3 relative">
@@ -25,8 +29,13 @@ export default function Header() {
       </div>
 
       {isOpen && (
-        <div className="absolute inset-0 bg-white z-40 px-6 py-20 flex flex-col space-y-6 text-lg">
-          <Link href="/history" className="hover:text-[#F26D4B] transition-colors">History</Link>
+        <div 
+          className="absolute inset-0 bg-white z-40 px-6 py-20 flex flex-col space-y-6 text-lg"
+          onClick={handleLinkClick}
+        >
+          <Link href="/history" className="hover:text-[#F26D4B] transition-colors">
+            History
+          </Link>
         </div>
       )}
     </header>
