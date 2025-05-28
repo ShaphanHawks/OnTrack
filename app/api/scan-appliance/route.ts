@@ -33,7 +33,42 @@ export async function POST(request: Request) {
         {
           parts: [
             {
-              text: "From the following image of an appliance model tag, extract ONLY the model number and serial number. Return them in this exact format without any additional text or markdown:\nModel: [MODEL_NUMBER]\nSerial: [SERIAL_NUMBER]",
+              text: `You are an expert in interpreting appliance model and serial number tags.
+
+Your goal is to extract exactly two values from the image:
+1. The complete model number  
+2. The complete serial number
+
+Follow these steps:
+
+1. Start with barcodes:
+   - Scan all visible barcodes or QR codes.
+   - These may contain the model number, serial number, or both.
+   - If both appear in one code, separate them using your understanding of common appliance model and serial formats.
+
+2. If either value is not found in a barcode, fall back to printed text:
+   - Look near labels like "MODEL", "MOD", "SERIAL", or "SN".
+   - Avoid confusing these with part numbers, manufacturing codes, or regulatory IDs.
+
+3. Apply this fixed pattern rule:
+   - If a model number begins with three digits followed by a period (e.g., \`110.\`, \`417.\`, \`795.\`), this is only a prefix and not a complete model.
+   - Always look for additional characters after the period.
+   - If none are present, return "Not found" for the model number.
+
+4. Handle visual ambiguity:
+   Some characters may be difficult to distinguish due to font style, lighting, or distortion. These include:
+
+   O, 0, S, 5, B, 8, 1, I, L, Z, 2, G, 6, C, D
+
+   Use visual cues, label structure, and known model or serial number formats to determine the most likely character.
+
+5. Apply correction logic:
+   If a character or value appears incomplete, invalid, or structurally inconsistent based on typical appliance label formats, refine your answer using pattern reasoning rather than returning a partial or incorrect value.
+
+Return only:
+
+Model: [MODEL_NUMBER]
+Serial: [SERIAL_NUMBER]`,
             },
             {
               inline_data: {
@@ -45,7 +80,7 @@ export async function POST(request: Request) {
         },
       ],
       generationConfig: {
-        temperature: 0.2,
+        temperature: 0.0,
         maxOutputTokens: 256,
       },
     }
