@@ -33,7 +33,7 @@ export async function POST(request: Request) {
         {
           parts: [
             {
-              text: `You are an expert in interpreting appliance model and serial number tags.
+              text: `[Prompt v3] You are an expert in interpreting appliance model and serial number tags.
 
 Your goal is to extract exactly two values from the image:
 1. The complete model number  
@@ -82,6 +82,9 @@ Serial: [SERIAL_NUMBER]`,
         maxOutputTokens: 256,
       },
     }
+
+    // Log the prompt text for verification
+    console.log("Gemini prompt being sent:", requestBody.contents[0].parts[0].text)
 
     console.log("Sending request to Gemini API...")
 
