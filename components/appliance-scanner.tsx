@@ -73,17 +73,20 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
         setModelNumber(newModelNumber)
         setSerialNumber(data.serialNumber || "Not found")
         onModelNumberChange(newModelNumber)
-        // Save to localStorage scan history
+        // Save to localStorage scan history (remove duplicates, newest on top)
         const scanResult = {
           modelNumber: newModelNumber,
           serialNumber: data.serialNumber || "Not found",
           date: Date.now(),
         }
         let history = JSON.parse(localStorage.getItem("scanHistory") || "[]")
-        // Remove any existing entries with the same model number
+        // Remove all existing entries with the same model number
         history = history.filter((item: any) => item.modelNumber !== newModelNumber)
         // Add the new scan result at the beginning of the array
         history.unshift(scanResult)
+        // Optionally limit to 100 entries
+        history = history.slice(0, 100)
+        console.log("Saving to scanHistory:", scanResult, history)
         localStorage.setItem("scanHistory", JSON.stringify(history))
       } else {
         throw new Error(data.error || "Failed to extract information")
