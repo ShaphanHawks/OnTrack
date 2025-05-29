@@ -115,7 +115,7 @@ export function PartsReviewsModule(): ReactElement {
   }
 
   return (
-    <div className={`max-w-xl mx-auto bg-white border rounded-lg p-4 shadow-sm ${showSettings ? 'border-vivid-orange' : 'border-[#FAD9CC]'}`}>
+    <div className={`w-[95vw] max-w-xl sm:mx-auto mx-[2.5vw] bg-white border rounded-lg p-4 shadow-sm ${showSettings ? 'border-vivid-orange' : 'border-[#FAD9CC]'}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-semibold text-gray-800">Parts Reviews</h2>
