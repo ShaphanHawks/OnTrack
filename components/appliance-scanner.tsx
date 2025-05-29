@@ -80,8 +80,11 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
           date: Date.now(),
         }
         let history = JSON.parse(localStorage.getItem("scanHistory") || "[]")
-        // Remove all existing entries with the same model number
-        history = history.filter((item: any) => item.modelNumber !== newModelNumber)
+        // Remove all existing entries with the same normalized model number
+        const normalizedModel = newModelNumber.trim().toUpperCase()
+        history = history.filter(
+          (item: any) => (item.modelNumber || "").trim().toUpperCase() !== normalizedModel
+        )
         // Add the new scan result at the beginning of the array
         history.unshift(scanResult)
         // Optionally limit to 100 entries
