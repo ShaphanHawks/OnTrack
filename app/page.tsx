@@ -30,7 +30,7 @@ export default function Dashboard() {
   }, [])
 
   return (
-    <div className="flex flex-col items-center w-full">
+    <div className="flex flex-col items-center w-full space-y-[5vw]">
       <ApplianceScanner 
         onModelNumberChange={setModelNumber} 
         initialModel={modelNumber}
