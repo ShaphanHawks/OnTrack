@@ -296,9 +296,8 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
             />
           </div>
           <Button
-            variant="outline"
             size="sm"
-            className="absolute bottom-2 right-2"
+            className="absolute bottom-2 right-2 bg-[#F26D4B] text-white hover:bg-[#e05c36]"
             onClick={() => {
               setImagePreview(null)
               setModelNumber(null)
@@ -306,7 +305,7 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
               setError(null)
             }}
           >
-            Replace
+            Start Over
           </Button>
         </div>
       )
@@ -460,23 +459,6 @@ export function ApplianceScanner({ onModelNumberChange, initialModel, initialSer
                   </div>
                 )}
               </>
-            )}
-
-            {/* Start Over Button */}
-            {(imagePreview || modelNumber || serialNumber || error) && (
-              <Button
-                className="w-full mt-2"
-                size="sm"
-                onClick={() => {
-                  setImagePreview(null)
-                  setModelNumber(null)
-                  setSerialNumber(null)
-                  setError(null)
-                }}
-                disabled={isProcessing}
-              >
-                Start Over
-              </Button>
             )}
           </div>
         </div>
