@@ -5,6 +5,11 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   // Check if the request is for an admin route
   if (request.nextUrl.pathname.startsWith('/admin')) {
+    // Skip auth check for the login page
+    if (request.nextUrl.pathname === '/admin/login') {
+      return NextResponse.next()
+    }
+
     // Check for the auth cookie
     const authCookie = request.cookies.get('editor-auth')
     
