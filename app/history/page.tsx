@@ -28,18 +28,16 @@ export default function HistoryPage() {
 
     loadHistory();
 
-    // Reload history when the page/tab becomes visible
-    const handleVisibility = () => {
-      if (document.visibilityState === "visible") {
-        loadHistory();
-      }
+    // Listen for route changes
+    const handleRouteChange = () => {
+      loadHistory();
     };
-    document.addEventListener("visibilitychange", handleVisibility);
+    router.events?.on("routeChangeComplete", handleRouteChange);
 
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibility);
+      router.events?.off("routeChangeComplete", handleRouteChange);
     };
-  }, []);
+  }, [router]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
