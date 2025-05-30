@@ -54,6 +54,12 @@ const defaultProviders: LinkProvider[] = [
     name: "Reliable Parts",
     urlTemplate: "https://reliableparts.net/us/content/#/search/{part}",
     isFavorite: true
+  },
+  {
+    id: "bensappliances",
+    name: "Ben's Appliances",
+    urlTemplate: "https://bens-appliances.com/search?type=product&options%5Bprefix%5D=last&options%5Bunavailable_products%5D=last&q={part}",
+    isFavorite: true
   }
 ]
 
