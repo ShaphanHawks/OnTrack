@@ -20,9 +20,26 @@ export default function HistoryPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const saved = localStorage.getItem("scanHistory")
-    if (saved) setHistory(JSON.parse(saved))
-  }, [])
+    const loadHistory = () => {
+      const saved = localStorage.getItem("scanHistory");
+      if (saved) setHistory(JSON.parse(saved));
+      else setHistory([]);
+    };
+
+    loadHistory();
+
+    // Reload history when the page/tab becomes visible
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        loadHistory();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
