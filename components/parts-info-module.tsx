@@ -28,7 +28,7 @@ const defaultProviders: LinkProvider[] = [
   {
     id: "partsdr",
     name: "PartsDr",
-    urlTemplate: "https://partsdr.com/model-number-search?query={part}",
+    urlTemplate: "https://partsdr.com/part/{part}",
     isFavorite: true
   },
   {
