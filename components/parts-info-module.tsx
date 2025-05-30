@@ -69,9 +69,6 @@ export function PartsReviewsModule(): ReactElement {
   const [open, setOpen] = useState<boolean>(true)
   const [showSettings, setShowSettings] = useState(false)
   const [providers, setProviders] = useState<LinkProvider[]>(defaultProviders)
-  const [showDialog, setShowDialog] = useState(false)
-  const [dialogCount, setDialogCount] = useState(0)
-  const [dialogLinks, setDialogLinks] = useState<string[]>([])
   const openAllButtonRef = useRef<HTMLButtonElement>(null)
 
   // Load persisted states
@@ -127,41 +124,13 @@ export function PartsReviewsModule(): ReactElement {
 
   // Open all links in new tabs
   const handleOpenAll = (links: string[]) => {
-    links.forEach(url => {
-      window.open(url, '_blank', 'noopener,noreferrer')
-    })
-  }
-
-  // Handler for Open ALL button
-  const onOpenAllClick = (links: string[]) => {
-    setDialogLinks(links)
-    setDialogCount(links.length)
-    setShowDialog(true)
+    links.forEach((url, i) => {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    });
   }
 
   return (
     <div className="w-[90vw] max-w-xl sm:mx-auto mx-[5vw] bg-white border border-orange-500 rounded-lg p-4 shadow-sm">
-      {/* Dialog for confirmation */}
-      {showDialog && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-            <div className="mb-4 text-lg font-semibold">Do you really want to open all {dialogCount} links?</div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowDialog(false)}>Cancel</Button>
-              <Button
-                style={{ backgroundColor: '#F26D4B', color: '#fff' }}
-                onClick={() => {
-                  handleOpenAll(dialogLinks)
-                  setShowDialog(false)
-                }}
-                autoFocus
-              >
-                <ExternalLink className="h-5 w-5 mr-2" color="#fff" /> OPEN ALL 2x
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-semibold text-gray-800">Parts Reviews</h2>
@@ -200,8 +169,8 @@ export function PartsReviewsModule(): ReactElement {
                   onClick={() => {
                     const links = showSettings
                       ? providers.map(p => getUrl(p.urlTemplate))
-                      : providers.filter(p => p.isFavorite).map(p => getUrl(p.urlTemplate))
-                    onOpenAllClick(links)
+                      : providers.filter(p => p.isFavorite).map(p => getUrl(p.urlTemplate));
+                    handleOpenAll(links);
                   }}
                 >
                   Open All
