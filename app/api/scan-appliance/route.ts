@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { kv } from "@vercel/kv"
 
 export async function POST(request: Request) {
   try {
@@ -142,12 +143,19 @@ Serial: [SERIAL_NUMBER]`,
 
       console.log("Extracted model:", modelNumber, "serial:", serialNumber)
 
+      // Increment the scan counter
+      try {
+        await kv.incr("total_scans")
+      } catch (error) {
+        console.error("Failed to increment scan counter:", error)
+        // Continue with the response even if counter increment fails
+      }
+
       // Only return the extracted model and serial numbers, not the full text
       return NextResponse.json({
         success: true,
         modelNumber,
         serialNumber,
-        // Removed fullText from the response
       })
     } else {
       throw new Error("No content found in Gemini response or unexpected response structure.")
