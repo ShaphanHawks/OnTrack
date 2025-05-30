@@ -184,12 +184,12 @@ export function PartsReviewsModule(): ReactElement {
             {/* Button row: only show Open ALL after search */}
             {submittedPartNumber ? (
               <div className="flex gap-2 w-full">
-                <Button type="submit" className="w-1/2" style={{ backgroundColor: '#7C3AED', color: '#fff' }}>
+                <Button type="submit" className="w-1/2 text-lg font-semibold flex items-center justify-center gap-2" style={{ backgroundColor: '#7C3AED', color: '#fff' }}>
                   Search
                 </Button>
                 <Button
                   type="button"
-                  className="w-1/2 font-bold flex items-center justify-center gap-2"
+                  className="w-1/2 text-lg font-semibold flex items-center justify-center gap-2"
                   style={{ backgroundColor: '#F26D4B', color: '#fff' }}
                   onClick={() => {
                     const links = showSettings
@@ -198,11 +198,14 @@ export function PartsReviewsModule(): ReactElement {
                     onOpenAllClick(links)
                   }}
                 >
-                  <ExternalLink className="h-5 w-5" color="#fff" /> OPEN ALL 2x
+                  Open All
+                  <ExternalLink className="h-5 w-5" color="#fff" />
+                  <ExternalLink className="h-5 w-5" color="#fff" />
+                  <ExternalLink className="h-5 w-5" color="#fff" />
                 </Button>
               </div>
             ) : (
-              <Button type="submit" className="w-full" style={{ backgroundColor: '#7C3AED', color: '#fff' }}>
+              <Button type="submit" className="w-full text-lg font-semibold flex items-center justify-center gap-2" style={{ backgroundColor: '#7C3AED', color: '#fff' }}>
                 Search
               </Button>
             )}
