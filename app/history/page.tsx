@@ -12,7 +12,7 @@ interface ScanHistoryItem {
 
 function formatDate(dateNum: number) {
   const d = new Date(dateNum)
-  return `${d.getMonth() + 1}/${d.getFullYear().toString().slice(-2)}`
+  return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear().toString().slice(-2)}`
 }
 
 export default function HistoryPage() {
@@ -28,17 +28,7 @@ export default function HistoryPage() {
     };
 
     loadHistory();
-
-    // Listen for route changes
-    const handleRouteChange = () => {
-      loadHistory();
-    };
-    router.events?.on("routeChangeComplete", handleRouteChange);
-
-    return () => {
-      router.events?.off("routeChangeComplete", handleRouteChange);
-    };
-  }, [router]);
+  }, []);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
@@ -53,7 +43,7 @@ export default function HistoryPage() {
   }
 
   // Show only the most recent 100 scans, most recent first
-  const limitedHistory = [...history].reverse().slice(0, 100)
+  const limitedHistory = history.slice(0, 100)
 
   const handleClearHistory = () => {
     if (window.confirm("Are you sure? This can't be reversed.")) {
