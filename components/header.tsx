@@ -13,10 +13,15 @@ export default function Header() {
 
   return (
     <header className="bg-white w-full">
-      <div className="flex justify-between items-center px-4 py-3 relative">
+      <div className="flex justify-between items-center px-4 py-3 relative" style={{ minHeight: '4.6rem' }}>
         <div className="w-10" /> {/* Spacer for balance */}
-        <Link href="/" className="text-xl font-semibold absolute left-1/2 transform -translate-x-1/2 hover:text-[#F26D4B] transition-colors">
-          OnTrack Tools
+        <Link href="/" className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center" style={{height: '115%'}}>
+          <img 
+            src="/ontrack-masthead.png" 
+            alt="OnTrack Masthead" 
+            className="object-contain h-16 sm:h-20 w-auto" 
+            style={{ maxHeight: '100%', maxWidth: '90vw' }}
+          />
         </Link>
 
         <button
