@@ -12,7 +12,7 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white w-full">
+    <header className="bg-white w-full mb-6">
       <div className="flex justify-between items-center px-4 py-3 relative" style={{ minHeight: '4.6rem' }}>
         <div className="w-10" /> {/* Spacer for balance */}
         <Link href="/" className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center" style={{height: '115%'}}>
