@@ -1,5 +1,6 @@
 'use client'
 
+// Content Editor Page - Central hub for managing editable pages
 import { useState, useEffect } from 'react'
 import WysiwygEditor from '@/components/wysiwyg-editor'
 import { useRouter } from 'next/navigation'
