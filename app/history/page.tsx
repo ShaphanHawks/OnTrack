@@ -22,6 +22,7 @@ export default function HistoryPage() {
   useEffect(() => {
     const loadHistory = () => {
       const saved = localStorage.getItem("scanHistory");
+      console.log("[HistoryPage] Raw scanHistory from localStorage:", saved);
       if (saved) setHistory(JSON.parse(saved));
       else setHistory([]);
     };
