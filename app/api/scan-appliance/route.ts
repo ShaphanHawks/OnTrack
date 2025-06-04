@@ -1,41 +1,60 @@
-import { NextResponse } from "next/server"
-import { kv } from "@vercel/kv"
+// Add these imports at the top of your existing file
+import { promises as fs } from 'fs'
+import path from 'path'
 
-export async function POST(request: Request) {
+// Add this interface near the top after your existing imports
+interface ScanResult {
+  modelNumber: string
+  serialNumber: string
+  confidence: string
+  corrections: string
+  scanType: 'barcode' | 'qr' | 'ocr' | 'mixed'
+  timestamp: string
+}
+
+// Add this logging function - place it before your main POST function
+async function logScanResult(result: ScanResult): Promise<void> {
   try {
-    // Get API key from environment variables
-    const apiKey = process.env.API_KEY
-
-    if (!apiKey) {
-      console.error("API_KEY environment variable is not set")
-      return NextResponse.json({ success: false, error: "API_KEY environment variable is not set" }, { status: 500 })
+    const logDir = path.join(process.cwd(), 'logs')
+    const logFile = path.join(logDir, 'scan_log.txt')
+    
+    // Ensure logs directory exists
+    try {
+      await fs.access(logDir)
+    } catch {
+      await fs.mkdir(logDir, { recursive: true })
     }
+    
+    // Create log entry
+    const logEntry = `${result.timestamp} | ${result.modelNumber} | ${result.serialNumber} | ${result.scanType.toUpperCase()} | ${result.corrections.toUpperCase()}\n`
+    
+    // Append to log file
+    await fs.appendFile(logFile, logEntry, 'utf8')
+    console.log('Scan logged successfully')
+  } catch (error) {
+    console.error('Failed to write to log file:', error)
+    // Don't throw - logging failure shouldn't break the main flow
+  }
+}
 
-    // Parse the multipart form data
-    const formData = await request.formData()
-    const imageFile = formData.get("image") as File
-
-    if (!imageFile) {
-      return NextResponse.json({ success: false, error: "No image provided" }, { status: 400 })
-    }
-
-    console.log("Image received:", imageFile.name, imageFile.type, imageFile.size)
-
-    // Convert the file to a base64 string
-    const arrayBuffer = await imageFile.arrayBuffer()
-    const base64Image = Buffer.from(arrayBuffer).toString("base64")
-
-    // Using gemini-1.5-flash model
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
-
-    // Updated prompt to handle multiple types of OCR violations and anomalies
-    const currentPromptText = `You are an expert in interpreting appliance model number tags with advanced OCR error correction.
+// REPLACE your existing prompt with this enhanced version that explicitly asks for scan type detection:
+const enhancedPromptText = `You are an expert in interpreting appliance model number tags with advanced OCR error correction.
 
 Your goal is to extract BOTH the MODEL NUMBER and SERIAL NUMBER with the highest possible accuracy by recognizing and correcting various OCR anomalies.
 
+CRITICAL: You must also identify HOW you obtained the information - whether from barcode, QR code, or text OCR.
+
 Key Instructions:
 - **Barcode Priority:** Barcode data, when available and clear, is the most reliable source.
+- **QR Code Priority:** QR code data is also highly reliable when present.
 - **Multi-Type OCR Error Correction:** Handle various types of scanning anomalies beyond simple character ambiguity.
+- **Source Identification:** Clearly identify whether data came from barcode, QR code, or OCR text reading.
+
+**SCAN TYPE IDENTIFICATION:**
+- BARCODE: Information extracted from traditional barcodes (linear barcodes)
+- QR: Information extracted from QR codes or 2D matrix codes
+- OCR: Information extracted from reading printed text
+- MIXED: Some information from codes, some from text
 
 **COMMON OCR VIOLATIONS TO DETECT AND CORRECT:**
 
@@ -72,9 +91,9 @@ Key Instructions:
 
 Follow these steps:
 
-1. **Barcode First Scan (Highest Priority):**
+1. **Barcode/QR Code First Scan (Highest Priority):**
    * Scan all visible barcodes and QR codes first for both model and serial numbers.
-   * If clear barcode data exists, use it and proceed to final validation.
+   * If clear barcode or QR code data exists, note this as the source type.
 
 2. **Multi-Line Text Analysis:**
    * Read ALL text on the label, paying attention to line relationships.
@@ -98,6 +117,13 @@ Follow these steps:
    Serial: [SERIAL_NUMBER]
    Confidence: [HIGH/MEDIUM/LOW]
    Corrections: [NONE/SPACING/LINEBREAK/CHARACTERS/MULTIPLE]
+   ScanType: [BARCODE/QR/OCR/MIXED]
+   
+   * SCANTYPE field must indicate the primary source of information:
+     - BARCODE: Model/Serial primarily from traditional barcode
+     - QR: Model/Serial primarily from QR code
+     - OCR: Model/Serial primarily from text reading
+     - MIXED: Some data from codes, some from text
    
    * CORRECTIONS field should indicate what type(s) of corrections were applied:
      - NONE: No corrections needed
@@ -107,7 +133,7 @@ Follow these steps:
      - MULTIPLE: Applied multiple correction types
    
    * CONFIDENCE levels:
-     - HIGH: Clear barcode read OR clear text with minimal corrections
+     - HIGH: Clear barcode/QR read OR clear text with minimal corrections
      - MEDIUM: Text required corrections but pattern-confident
      - LOW: Multiple corrections applied or pattern uncertain
    
@@ -116,125 +142,72 @@ Follow these steps:
    Serial: FT220001234
    Confidence: MEDIUM
    Corrections: LINEBREAK
+   ScanType: OCR
    
    Model: WOS51EC0HS20
    Serial: Not found
    Confidence: HIGH
-   Corrections: NONE`;
+   Corrections: NONE
+   ScanType: BARCODE`;
 
-    const requestBody = {
-      contents: [
-        {
-          parts: [
-            {
-              text: currentPromptText,
-            },
-            {
-              inline_data: {
-                mime_type: imageFile.type,
-                data: base64Image,
-              },
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.0,
-        maxOutputTokens: 256, 
-      },
-    }
+// MODIFY your response parsing section to extract the new scanType field:
+// Replace the existing parsing loop with this enhanced version:
 
-    console.log("Gemini prompt being sent (Model and Serial Number Extraction):", requestBody.contents[0].parts[0].text)
-    console.log("Sending request to Gemini API...")
+const lines = extractedText.split('\n');
+let confidence = "LOW"; // default
+let corrections = "NONE"; // default
+let scanType = "OCR"; // default
 
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      console.error("API Error:", errorData)
-      return NextResponse.json(
-        {
-          success: false,
-          error: `API request failed: ${response.status} ${response.statusText}. ${errorData.error?.message || ""}`,
-        },
-        { status: response.status },
-      )
-    }
-
-    const data = await response.json()
-    console.log("API Response:", data)
-
-    if (
-      data.candidates &&
-      data.candidates.length > 0 &&
-      data.candidates[0].content &&
-      data.candidates[0].content.parts &&
-      data.candidates[0].content.parts.length > 0
-    ) {
-      const extractedText = data.candidates[0].content.parts[0].text.trim();
-      console.log("Extracted text from Gemini:", extractedText);
-
-      let modelNumber = "Not found";
-      let serialNumber = "Not found";
-
-      // Parse the structured response
-      const lines = extractedText.split('\n');
-      let confidence = "LOW"; // default
-      let corrections = "NONE"; // default
-      
-      for (const line of lines) {
-        const trimmedLine = line.trim();
-        if (trimmedLine.toLowerCase().startsWith('model:')) {
-          modelNumber = trimmedLine.substring(6).trim(); // Remove "Model:" prefix
-        } else if (trimmedLine.toLowerCase().startsWith('serial:')) {
-          serialNumber = trimmedLine.substring(7).trim(); // Remove "Serial:" prefix
-        } else if (trimmedLine.toLowerCase().startsWith('confidence:')) {
-          confidence = trimmedLine.substring(11).trim(); // Remove "Confidence:" prefix
-        } else if (trimmedLine.toLowerCase().startsWith('corrections:')) {
-          corrections = trimmedLine.substring(12).trim(); // Remove "Corrections:" prefix
-        }
-      }
-
-      console.log("Processed model:", modelNumber);
-      console.log("Processed serial:", serialNumber);
-      console.log("Confidence level:", confidence);
-      console.log("Corrections applied:", corrections);
-      
-      // Increment the scan counter with detailed tracking
-      try {
-        await kv.incr("total_scans")
-        // Track confidence levels
-        await kv.incr(`scans_${confidence.toLowerCase()}`)
-        // Track correction types
-        await kv.incr(`corrections_${corrections.toLowerCase()}`)
-      } catch (error) {
-        console.error("Failed to increment scan counter:", error)
-      }
-
-      return NextResponse.json({
-        success: true,
-        modelNumber,
-        serialNumber,
-        confidence: confidence.toLowerCase(),
-        corrections: corrections.toLowerCase(),
-      })
-    } else {
-      throw new Error("No content found in Gemini response or unexpected response structure.")
-    }
-  } catch (error) {
-    console.error("Error processing image:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : "An unknown error occurred",
-      },
-      { status: 500 },
-    )
+for (const line of lines) {
+  const trimmedLine = line.trim();
+  if (trimmedLine.toLowerCase().startsWith('model:')) {
+    modelNumber = trimmedLine.substring(6).trim();
+  } else if (trimmedLine.toLowerCase().startsWith('serial:')) {
+    serialNumber = trimmedLine.substring(7).trim();
+  } else if (trimmedLine.toLowerCase().startsWith('confidence:')) {
+    confidence = trimmedLine.substring(11).trim();
+  } else if (trimmedLine.toLowerCase().startsWith('corrections:')) {
+    corrections = trimmedLine.substring(12).trim();
+  } else if (trimmedLine.toLowerCase().startsWith('scantype:')) {
+    scanType = trimmedLine.substring(9).trim();
   }
 }
+
+console.log("Processed model:", modelNumber);
+console.log("Processed serial:", serialNumber);
+console.log("Confidence level:", confidence);
+console.log("Corrections applied:", corrections);
+console.log("Scan type:", scanType);
+
+// CREATE scan result object for logging
+const scanResult: ScanResult = {
+  modelNumber,
+  serialNumber,
+  confidence: confidence.toLowerCase(),
+  corrections: corrections.toLowerCase(),
+  scanType: scanType.toLowerCase() as 'barcode' | 'qr' | 'ocr' | 'mixed',
+  timestamp: new Date().toISOString()
+};
+
+// LOG the scan result
+await logScanResult(scanResult);
+
+// MODIFY your existing KV tracking to include scan type:
+try {
+  await kv.incr("total_scans")
+  await kv.incr(`scans_${confidence.toLowerCase()}`)
+  await kv.incr(`corrections_${corrections.toLowerCase()}`)
+  await kv.incr(`scantype_${scanType.toLowerCase()}`) // NEW: Track scan types
+} catch (error) {
+  console.error("Failed to increment scan counter:", error)
+}
+
+// MODIFY your return statement to include scanType:
+return NextResponse.json({
+  success: true,
+  modelNumber,
+  serialNumber,
+  confidence: confidence.toLowerCase(),
+  corrections: corrections.toLowerCase(),
+  scanType: scanType.toLowerCase(), // NEW: Include scan type in response
+})
