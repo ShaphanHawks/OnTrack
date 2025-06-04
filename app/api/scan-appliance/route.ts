@@ -1,76 +1,3 @@
-
-Gemine scrwed up a coding request. Heer is the incorrect code:
-
-I'd be happy to help fix the code! However, I don't see the incorrect code in your message. Could you please share the code that Gemini provided so I can identify the issues and help you get it working correctly?
-
-Once you paste the code, I can:
-
-Identify what's wrong with it
-Explain why it's not working
-Provide a corrected version
-Explain the fixes I made
-Just paste the code and let me know what it was supposed to do, and I'll get it sorted out for you.
-
-
-
-
-
-import { NextResponse } from "next/server" import { kv } from "@vercel/kv" export async function POST(request: Request) { try { // Get API key from environment variables const apiKey = process.env.API_KEY if (!apiKey) { console.error("API_KEY environment variable is not set")
-
-pasted
-
-Looking at this code, I can see it's a Next.js API route that processes images to extract appliance model numbers using Google's Gemini AI. The code appears to be generally well-structured, but I notice a few potential issues and areas for improvement:
-
-
-Fixed Next.js API Route for Model Number Extraction
-Code 
-
-
-
-thats the not the issue. The issue is we are asking for the following output for our JSON program: Model: [MODEL_NUMBER]
-Serial: [SERIAL_NUMBER] Right now im not sure what is being asked for
-
-I see the issue! You want the Gemini AI to return structured output in the format:
-
-Model: [MODEL_NUMBER]
-Serial: [SERIAL_NUMBER]
-But the current prompt is telling Gemini to return ONLY the raw model number string with no labels or formatting. Let me fix the prompt to request both model and serial numbers in the format you need:
-
-
-Fixed Code with Correct Output Format
-Code 
-The key changes I made:
-
-Updated the prompt to ask for both model and serial numbers in the exact format you want:
-Model: [MODEL_NUMBER]
-Serial: [SERIAL_NUMBER]
-Added parsing logic to extract both values from the structured response:
-Splits the response by lines
-Looks for lines starting with "Model:" and "Serial:"
-Extracts the values after the colons
-Updated the instructions to tell Gemini to look for serial number keywords like "SERIAL", "SER", "S/N", "SN"
-Improved the response processing to handle both model and serial numbers properly
-Now Gemini will return structured output like:
-
-Model: WOS51EC0HS20
-Serial: FT220001234
-And your code will properly parse both values for your JSON response.
-
-
-
-
-
-wait.. this line "he actual model number you found', this means after it extrpolated right?
-
-Yes, exactly! The "actual model number you found" refers to the final result after all the extrapolation and correction steps.
-
-Here's the flow:
-
-Initial scan - Gemini reads what it thinks it sees (might have ambiguous characters)
-Extrapolation/correction - If there are ambiguous characters from the list [O, 0, S, 5, B, 8, 1, I, L, Z, 2, G, 6, C, D], Gemini uses its knowledge of appliance model numb
-
-
-
 import { NextResponse } from "next/server"
 import { kv } from "@vercel/kv"
 
@@ -101,15 +28,15 @@ export async function POST(request: Request) {
     // Using gemini-1.5-flash model
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
 
-    // Updated prompt to extract both model and serial numbers in the required format
+    // Updated prompt to extract both model and serial numbers with proper ambiguity handling
     const currentPromptText = `You are an expert in interpreting appliance model number tags.
 
 Your goal is to extract BOTH the MODEL NUMBER and SERIAL NUMBER with the highest possible accuracy.
 
 Key Instructions:
 - **Barcode Priority:** Barcode data, when available and clear, is the most reliable source.
-- **Model Number Scrubbing for Ambiguity:** For model numbers extracted from PRINTED TEXT containing ambiguous characters (from the list below), use your knowledge of common appliance model number formats and patterns to help correct ONLY those identified ambiguous characters.
-- **Ambiguous Characters List:** [O, 0, S, 5, B, 8, 1, I, L, Z, 2, G, 6, C, D] — if you detect any of these in printed text, they require special attention and correction based on nomenclature.
+- **Model Number Ambiguity Handling:** For model numbers extracted from PRINTED TEXT containing ambiguous characters, use pattern-based analysis but avoid assumptions that certain characters are "always wrong."
+- **Ambiguous Characters List:** [O, 0, S, 5, B, 8, 1, I, L, Z, 2, G, 6, C, D] — these require careful analysis when found in model numbers from printed text.
 
 Follow these steps:
 
@@ -122,14 +49,20 @@ Follow these steps:
    * If the model number or serial number is not found in barcodes, then scan the printed text on the label.
    * Focus on text near keywords indicating a model number: "MODEL", "MOD", "M", or similar identifiers.
    * Focus on text near keywords indicating a serial number: "SERIAL", "SER", "S/N", "SN", or similar identifiers.
-   * During this initial scan of printed text, make your best guess for each character. Internally flag any characters that fall into the 'Ambiguous Characters List' above.
+   * During this initial scan of printed text for the model number, make your best guess for each character. Internally flag any characters that fall into the 'Ambiguous Characters List' above.
 
-3. **Mandatory Correction of Ambiguous Characters from Printed Text:**
-   * This step applies ONLY if the information was derived from printed text AND contains characters from the ambiguous list.
-   * Use your knowledge of appliance nomenclature and patterns to correct ambiguous characters.
-   * For example: If an initial scan yields 'WOS51EC0HS2O' and the final 'O' is ambiguous, and your knowledge indicates this model format never ends in a letter, correct it to '0' if that fits the pattern.
+3. **Pattern-Based Analysis for Ambiguous Characters in Model Number:**
+   * This step applies ONLY if the MODEL NUMBER was derived from printed text AND contains ANY characters from the ambiguous list [O, 0, S, 5, B, 8, 1, I, L, Z, 2, G, 6, C, D].
+   * **Critical Rule:** Do NOT assume any character is "always wrong" - both letters and numbers can be valid in different model number formats.
+   * **Pattern-Based Correction Approach:**
+     - **High Confidence Corrections:** Only when appliance nomenclature patterns can definitively determine the correct character (e.g., S/5 ambiguity where the pattern clearly indicates only numbers are valid in that specific position for that brand/format).
+     - **Low Confidence Situations:** When patterns cannot definitively rule out either option (e.g., I vs L, or O vs 0 where both could be valid), make your best visual assessment but do NOT force changes just for the sake of changing.
+     - **Examples:**
+       * If 'WOS51EC0HS2S' and you know this Whirlpool format ends in numbers, and the final 'S' is clearly meant to be '5', then correct it.
+       * If 'MODEL3I7' and both 'I' and 'L' could be valid letters in that position, make your best judgment without forcing a change.
+       * If 'ABC12O34' and both 'O' and '0' are commonly used in that position for this brand, choose based on visual clarity, not assumptions.
 
-4. **Apply Mandatory Fixed Pattern Rule:**
+4. **Apply Fixed Pattern Rule for Model Numbers:**
    * If a model number begins with a three-digit prefix (e.g., 110, 417, 795), this is only a prefix and not a complete model. Always look for additional characters after the prefix, whether or not a period is present. If no additional characters are found after such a prefix, return "Not found" for the model number.
 
 5. **Final Output Structure:**
@@ -137,12 +70,12 @@ Follow these steps:
    Model: [MODEL_NUMBER]
    Serial: [SERIAL_NUMBER]
    
-   * Replace [MODEL_NUMBER] with the actual model number you found, or "Not found" if no model number could be determined.
+   * Replace [MODEL_NUMBER] with the actual model number you determined (after any pattern-based analysis), or "Not found" if no model number could be determined.
    * Replace [SERIAL_NUMBER] with the actual serial number you found, or "Not found" if no serial number could be determined.
    * Do NOT include any other text, explanations, or formatting beyond this exact structure.
    
    Examples:
-   Model: WOS51EC0HS20
+   Model: WOS51EC0HS25
    Serial: FT220001234
    
    Or if not found:
