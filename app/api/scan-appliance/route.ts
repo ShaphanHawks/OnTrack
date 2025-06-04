@@ -28,45 +28,7 @@ export async function POST(request: Request) {
     // Using gemini-1.5-flash model
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
 
-    /*
-    ####### OLD PROMPT ([Prompt v3]) ########
-    const oldPromptText = \`[Prompt v3] You are an expert in interpreting appliance model and serial number tags.
-
-Your goal is to extract exactly two values from the image:
-1. The complete model number  
-2. The complete serial number
-
-Follow these steps:
-
-1. Start with barcodes:
-   - Scan all visible barcodes or QR codes in the image.
-   - Some barcodes may contain only the model number, some only the serial number, and some may contain both.
-   - If a barcode contains both, separate them using your understanding of common appliance model and serial formats.
-   - Continue scanning until you find both a model and a serial number, or until you have checked all barcodes.
-
-2. If either value is not found in a barcode, fall back to printed text:
-   - Look near labels like "MODEL", "MOD", "SERIAL", or "SN".
-   - Avoid confusing these with part numbers, manufacturing codes, or regulatory IDs.
-
-3. Apply this fixed pattern rule:
-   - If a model number begins with a three-digit prefix (e.g., 110, 417, 795), this is only a prefix and not a complete model.
-   - Always look for additional characters after the prefix, whether or not a period is present.
-   - If no additional characters are found, return "Not found" for the model number.
-
-4. Handle visual ambiguity:
-   Some characters may be difficult to distinguish due to font style, lighting, or distortion. These include:
-   O, 0, S, 5, B, 8, 1, I, L, Z, 2, G, 6, C, D
-   Use visual cues, label structure, and known model or serial number formats to determine the most likely character.
-
-5. Apply correction logic:
-   If a character or value appears incomplete, invalid, or structurally inconsistent based on typical appliance label formats, refine your answer using pattern reasoning rather than returning a partial or incorrect value.
-
-Return only:
-Model: [MODEL_NUMBER]
-Serial: [SERIAL_NUMBER]\`;
-    */
-
-    // New prompt focusing only on Model Number extraction, with strong ambiguity handling and direct output
+    // Refined prompt focusing only on Model Number extraction, with strong ambiguity handling and direct output
     const currentPromptText = \`You are an expert in interpreting appliance model number tags.
 
 Your sole goal is to extract ONLY the complete MODEL NUMBER with the highest possible accuracy.
@@ -177,6 +139,7 @@ Follow these steps:
       if (extractedText && extractedText.toLowerCase() !== "not found") {
         modelNumber = extractedText;
       } else if (extractedText && extractedText.toLowerCase() === "not found") {
+        // This case handles if Gemini explicitly returns "Not found" as the model number
         modelNumber = "Not found"; 
       }
       // If extractedText is empty or something else, modelNumber remains "Not found"
@@ -193,7 +156,7 @@ Follow these steps:
       return NextResponse.json({
         success: true,
         modelNumber,
-        serialNumber, // Keep the field for frontend compatibility, will be "Not found"
+        serialNumber, // Keep the field for frontend compatibility, will likely be "Not found"
       })
     } else {
       throw new Error("No content found in Gemini response or unexpected response structure.")
