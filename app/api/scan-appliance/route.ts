@@ -28,59 +28,99 @@ export async function POST(request: Request) {
     // Using gemini-1.5-flash model
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
 
-    // Updated prompt to extract both model and serial numbers with proper ambiguity handling
-    const currentPromptText = `You are an expert in interpreting appliance model number tags.
+    // Updated prompt to handle multiple types of OCR violations and anomalies
+    const currentPromptText = `You are an expert in interpreting appliance model number tags with advanced OCR error correction.
 
-Your goal is to extract BOTH the MODEL NUMBER and SERIAL NUMBER with the highest possible accuracy.
+Your goal is to extract BOTH the MODEL NUMBER and SERIAL NUMBER with the highest possible accuracy by recognizing and correcting various OCR anomalies.
 
 Key Instructions:
 - **Barcode Priority:** Barcode data, when available and clear, is the most reliable source.
-- **Model Number Ambiguity Handling:** For model numbers extracted from PRINTED TEXT containing ambiguous characters, use pattern-based analysis but avoid assumptions that certain characters are "always wrong."
-- **Ambiguous Characters List:** [O, 0, S, 5, B, 8, 1, I, L, Z, 2, G, 6, C, D] — these require careful analysis when found in model numbers from printed text.
+- **Multi-Type OCR Error Correction:** Handle various types of scanning anomalies beyond simple character ambiguity.
+
+**COMMON OCR VIOLATIONS TO DETECT AND CORRECT:**
+
+1. **Character Ambiguity:** [O, 0, S, 5, B, 8, 1, I, L, Z, 2, G, 6, C, D] - use pattern knowledge to correct when confident.
+
+2. **Line Break Violations:** Model numbers split across lines
+   - Example: "111. 6126222" should be "111.61262220" 
+   - Look for: prefix on one line, continuation below
+   - Kenmore pattern: "111.########" often appears as "111. ######" with suffix on next line
+
+3. **Spacing Anomalies:** Extra spaces inserted in model numbers
+   - Example: "W OS51 EC0HS20" should be "WOS51EC0HS20"
+   - Example: "NE59 M4320SS" should be "NE59M4320SS"
+
+4. **Missing Decimal Points:** Numbers that should have decimals
+   - Example: "11161262220" might need to be "111.61262220" for Kenmore
+   - Look for 3-digit prefixes that typically have periods
+
+5. **Character Substitution Errors:** 
+   - Dashes interpreted as other characters: "WOS51-EC0HS20" vs "WOS51EC0HS20"
+   - Periods as commas or other punctuation
+   - Letters as numbers in unexpected positions
+
+6. **Incomplete Scans:** Partial model numbers due to poor image quality
+   - Look for obvious truncation patterns
+   - Check if visible portion matches known prefixes
+
+7. **Case Sensitivity Issues:** All caps vs mixed case interpretation
+
+**BRAND-SPECIFIC VIOLATION PATTERNS:**
+- **Kenmore:** Frequently "111.########" appears as "111. #######" (missing final digit on second line)
+- **Whirlpool:** "W" prefix sometimes read as "VV" or split
+- **GE:** Letter-number boundaries often have spacing issues
 
 Follow these steps:
 
 1. **Barcode First Scan (Highest Priority):**
-   * Thoroughly scan all visible barcodes and QR codes first.
-   * If barcodes clearly provide the model number and/or serial number, prioritize these values.
-   * If multiple barcodes offer conflicting information, use your best judgment based on clarity and common label layouts.
+   * Scan all visible barcodes and QR codes first for both model and serial numbers.
+   * If clear barcode data exists, use it and proceed to final validation.
 
-2. **Printed Text Scan (If Not Found in Barcode):**
-   * If the model number or serial number is not found in barcodes, then scan the printed text on the label.
-   * Focus on text near keywords indicating a model number: "MODEL", "MOD", "M", or similar identifiers.
-   * Focus on text near keywords indicating a serial number: "SERIAL", "SER", "S/N", "SN", or similar identifiers.
-   * During this initial scan of printed text for the model number, make your best guess for each character. Internally flag any characters that fall into the 'Ambiguous Characters List' above.
+2. **Multi-Line Text Analysis:**
+   * Read ALL text on the label, paying attention to line relationships.
+   * Look for model number components that may span multiple lines.
+   * Check for common split patterns (prefix on one line, suffix below).
 
-3. **Pattern-Based Analysis for Ambiguous Characters in Model Number:**
-   * This step applies ONLY if the MODEL NUMBER was derived from printed text AND contains ANY characters from the ambiguous list [O, 0, S, 5, B, 8, 1, I, L, Z, 2, G, 6, C, D].
-   * **Critical Rule:** Do NOT assume any character is "always wrong" - both letters and numbers can be valid in different model number formats.
-   * **Pattern-Based Correction Approach:**
-     - **High Confidence Corrections:** Only when appliance nomenclature patterns can definitively determine the correct character (e.g., S/5 ambiguity where the pattern clearly indicates only numbers are valid in that specific position for that brand/format).
-     - **Low Confidence Situations:** When patterns cannot definitively rule out either option (e.g., I vs L, or O vs 0 where both could be valid), make your best visual assessment but do NOT force changes just for the sake of changing.
-     - **Examples:**
-       * If 'WOS51EC0HS2S' and you know this Whirlpool format ends in numbers, and the final 'S' is clearly meant to be '5', then correct it.
-       * If 'MODEL3I7' and both 'I' and 'L' could be valid letters in that position, make your best judgment without forcing a change.
-       * If 'ABC12O34' and both 'O' and '0' are commonly used in that position for this brand, choose based on visual clarity, not assumptions.
+3. **Violation Detection and Correction:**
+   * **Line Break Correction:** If you see a 3-digit number with period/space followed by numbers on the next line, consider combining them.
+   * **Spacing Removal:** Remove inappropriate spaces within likely model numbers.
+   * **Character Correction:** Apply ambiguous character fixes only when pattern-confident.
+   * **Decimal Addition:** For Kenmore-style numbers, add missing decimal if pattern suggests it.
+   * **Completion:** If a model appears truncated but you can see a clear pattern, note the incomplete status.
 
-4. **Apply Fixed Pattern Rule for Model Numbers:**
-   * If a model number begins with a three-digit prefix (e.g., 110, 417, 795), this is only a prefix and not a complete model. Always look for additional characters after the prefix, whether or not a period is present. If no additional characters are found after such a prefix, return "Not found" for the model number.
+4. **Pattern Validation:**
+   * Validate corrected model numbers against known brand patterns.
+   * Cross-check that corrections make logical sense for the detected brand.
 
 5. **Final Output Structure:**
    * Your response must be in EXACTLY this format:
    Model: [MODEL_NUMBER]
    Serial: [SERIAL_NUMBER]
+   Confidence: [HIGH/MEDIUM/LOW]
+   Corrections: [NONE/SPACING/LINEBREAK/CHARACTERS/MULTIPLE]
    
-   * Replace [MODEL_NUMBER] with the actual model number you determined (after any pattern-based analysis), or "Not found" if no model number could be determined.
-   * Replace [SERIAL_NUMBER] with the actual serial number you found, or "Not found" if no serial number could be determined.
-   * Do NOT include any other text, explanations, or formatting beyond this exact structure.
+   * CORRECTIONS field should indicate what type(s) of corrections were applied:
+     - NONE: No corrections needed
+     - SPACING: Removed inappropriate spaces
+     - LINEBREAK: Combined text from multiple lines
+     - CHARACTERS: Fixed ambiguous character substitutions
+     - MULTIPLE: Applied multiple correction types
+   
+   * CONFIDENCE levels:
+     - HIGH: Clear barcode read OR clear text with minimal corrections
+     - MEDIUM: Text required corrections but pattern-confident
+     - LOW: Multiple corrections applied or pattern uncertain
    
    Examples:
-   Model: WOS51EC0HS25
+   Model: 111.61262220
    Serial: FT220001234
+   Confidence: MEDIUM
+   Corrections: LINEBREAK
    
-   Or if not found:
-   Model: Not found
-   Serial: Not found`;
+   Model: WOS51EC0HS20
+   Serial: Not found
+   Confidence: HIGH
+   Corrections: NONE`;
 
     const requestBody = {
       contents: [
@@ -145,21 +185,34 @@ Follow these steps:
 
       // Parse the structured response
       const lines = extractedText.split('\n');
+      let confidence = "LOW"; // default
+      let corrections = "NONE"; // default
+      
       for (const line of lines) {
         const trimmedLine = line.trim();
         if (trimmedLine.toLowerCase().startsWith('model:')) {
           modelNumber = trimmedLine.substring(6).trim(); // Remove "Model:" prefix
         } else if (trimmedLine.toLowerCase().startsWith('serial:')) {
           serialNumber = trimmedLine.substring(7).trim(); // Remove "Serial:" prefix
+        } else if (trimmedLine.toLowerCase().startsWith('confidence:')) {
+          confidence = trimmedLine.substring(11).trim(); // Remove "Confidence:" prefix
+        } else if (trimmedLine.toLowerCase().startsWith('corrections:')) {
+          corrections = trimmedLine.substring(12).trim(); // Remove "Corrections:" prefix
         }
       }
 
       console.log("Processed model:", modelNumber);
       console.log("Processed serial:", serialNumber);
+      console.log("Confidence level:", confidence);
+      console.log("Corrections applied:", corrections);
       
-      // Increment the scan counter
+      // Increment the scan counter with detailed tracking
       try {
         await kv.incr("total_scans")
+        // Track confidence levels
+        await kv.incr(`scans_${confidence.toLowerCase()}`)
+        // Track correction types
+        await kv.incr(`corrections_${corrections.toLowerCase()}`)
       } catch (error) {
         console.error("Failed to increment scan counter:", error)
       }
@@ -168,6 +221,8 @@ Follow these steps:
         success: true,
         modelNumber,
         serialNumber,
+        confidence: confidence.toLowerCase(),
+        corrections: corrections.toLowerCase(),
       })
     } else {
       throw new Error("No content found in Gemini response or unexpected response structure.")
