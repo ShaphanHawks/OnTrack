@@ -164,7 +164,6 @@ Follow these steps:
    Corrections: NONE
    ScanType: BARCODE`;
 
-
 export async function POST(req: NextRequest) {
   try {
     // --- Placeholder: Extract image data from request ---
@@ -177,7 +176,7 @@ export async function POST(req: NextRequest) {
     // --- Placeholder: Call your AI model ---
     // This is where you would send `imageData` and `enhancedPromptText` to Gemini or another AI model
     // and receive the `extractedText` string as a response.
-    // For demonstration, we'll use a mock `extractedText`. Replace with actual AI call.
+    // For demonstration, we'll use a mock `extractedTextFromAI`. Replace with actual AI call.
     const extractedTextFromAI = `Model: FRT15O3JWO
 Serial: BA82123524
 Confidence: LOW
@@ -206,10 +205,10 @@ ScanType: OCR`;
       } else if (trimmedLine.toLowerCase().startsWith('scantype:')) {
         const st = trimmedLine.substring(9).trim().toLowerCase();
         if (st === 'barcode' || st === 'qr' || st === 'ocr' || st === 'mixed') {
-            scanType = st as ScanResult['scanType'];
+          scanType = st as ScanResult['scanType'];
         } else {
-            scanType = 'ocr'; // fallback to default if invalid
-            console.warn(`Invalid ScanType received: ${st}, defaulting to 'ocr'.`)
+          scanType = 'ocr'; // fallback to default if invalid
+          console.warn(`Invalid ScanType received: ${st}, defaulting to 'ocr'.`);
         }
       }
     }
@@ -226,7 +225,7 @@ ScanType: OCR`;
       serialNumber,
       confidence: confidence.toLowerCase(),
       corrections: corrections.toLowerCase(),
-      scanType: scanType, // already toLowerCase and validated
+      scanType: scanType,
       timestamp: new Date().toISOString()
     };
 
