@@ -21,31 +21,31 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        {/* Google Analytics gtag.js snippet */}
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-2TM1920237"
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-2TM1920237');
-            `,
-          }}
 
-          <script
-  defer
-  data-domain="ontrack.tools"
-  src="https://plausible.io/js/script.js"
-/>
+<head>
+  {/* Google Analytics gtag.js snippet */}
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-2TM1920237"
+  />
+  <script
+    dangerouslySetInnerHTML={{
+      __html: `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-2TM1920237');
+      `,
+    }}
+  />
+  {/* Plausible Analytics */}
+  <script
+    defer
+    data-domain="ontrack.tools"
+    src="https://plausible.io/js/script.js"
+  />
+</head>
 
-        
-        />
-      </head>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
