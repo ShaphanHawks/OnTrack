@@ -36,6 +36,14 @@ export default function RootLayout({
               gtag('config', 'G-2TM1920237');
             `,
           }}
+
+          <script
+  defer
+  data-domain="ontrack.tools"
+  src="https://plausible.io/js/script.js"
+/>
+
+        
         />
       </head>
       <body className={inter.className}>
