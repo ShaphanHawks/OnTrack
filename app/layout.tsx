@@ -23,9 +23,10 @@ export default function RootLayout({
     <html lang="en">
 
 <head>
-  {/*Plausible  */}
-<script defer data-domain="ontrack.tools" src="https://plausible.io/js/script.js"></script>
+  {/* Plausible Analytics */}
+  <script defer data-domain="ontrack.tools" src="https://plausible.io/js/script.js"></script>
 
+  {/* Google Analytics */}
   <script
     dangerouslySetInnerHTML={{
       __html: `
@@ -36,7 +37,6 @@ export default function RootLayout({
       `,
     }}
   />
-  
 </head>
 
       <body className={inter.className}>
