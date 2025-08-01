@@ -187,7 +187,7 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
       document.body.appendChild(form)
       form.submit()
       document.body.removeChild(form)
-      
+
       // Mark provider as loaded
       setLoadedProviders(prev => new Set([...Array.from(prev), provider.id]))
     }
@@ -214,7 +214,7 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
           {open ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
         </button>
       </div>
-      
+
       {open && (
         <div className="space-y-2">
           {showSettings ? (
@@ -261,12 +261,11 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
               .filter(p => p.isFavorite)
               .map(provider => (
                 provider.method === 'POST' ? (
-                  <button
+                  
+                    <Button
                     key={provider.id}
-                    onClick={() => handleProviderClick(provider)}
-                    className="w-full"
-                  >
-                    <Button variant="outline" className="w-full justify-between">
+                     variant="outline" className="w-full justify-between" onClick={() => handleProviderClick(provider)}
+                    >
                       <div className="flex items-center gap-2">
                         {loadedProviders.has(provider.id) && (
                           <CheckCircle2 className="h-5 w-5 text-green-500" />
@@ -275,7 +274,7 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
                       </div>
                       <ExternalLink className="h-4 w-4" />
                     </Button>
-                  </button>
+                 
                 ) : (
                   <a
                     key={provider.id}
@@ -302,4 +301,4 @@ export function LookupsModule({ modelTag }: LookupsModuleProps): ReactElement {
       )}
     </div>
   )
-} 
+}
