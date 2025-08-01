@@ -134,13 +134,13 @@ Follow these steps:
    Confidence: [HIGH/MEDIUM/LOW]
    Corrections: [NONE/SPACING/LINEBREAK/CHARACTERS/MULTIPLE/AMBIGUOUS_UNRESOLVED]
    ScanType: [BARCODE/QR/OCR/MIXED]
-   
+
    * SCANTYPE field must indicate the primary source of information:
      - BARCODE: Model/Serial primarily from traditional barcode
      - QR: Model/Serial primarily from QR code
      - OCR: Model/Serial primarily from text reading
      - MIXED: Some data from codes, some from text
-   
+
    * CORRECTIONS field should indicate what type(s) of corrections were applied:
      - NONE: No corrections needed
      - SPACING: Removed inappropriate spaces
@@ -148,19 +148,19 @@ Follow these steps:
      - CHARACTERS: Fixed ambiguous character substitutions following protocols
      - MULTIPLE: Applied multiple correction types
      - AMBIGUOUS_UNRESOLVED: If a High-Risk Character's ambiguity could not be definitively resolved by patterns.
-   
+
    * CONFIDENCE levels:
      - HIGH: Clear barcode/QR read OR clear text with minimal corrections not involving High-Risk Characters.
      - MEDIUM: Text required corrections following protocols, and patterns provided a clear resolution.
      - LOW: Multiple corrections applied, pattern uncertain, or High-Risk Character ambiguity remains.
-   
+
    Examples:
    Model: 111.61262220
    Serial: FT220001234
    Confidence: MEDIUM
    Corrections: LINEBREAK
    ScanType: OCR
-   
+
    Model: WOS51EC0HS20
    Serial: Not found
    Confidence: HIGH
@@ -281,7 +281,14 @@ ScanType: OCR`;
 }
 
 // You can also define other HTTP method handlers if your API needs them:
-// export async function GET(request: NextRequest) {
-//   // Example:
-//   return NextResponse.json({ message: "This is the scan appliance API. Use POST to submit data." });
-// }
+export async function GET() {
+  // --- Placeholder: Call your AI model ---
+  // This is where you would send `imageData` (processed from request)
+  //         *********
+
+  // and `enhancedPromptText` to Gemini or another AI model.
+  // The AI should return text in the specified "Final Output Structure".
+
+  // For demonstration, we'll use a mock `extractedTextFromAI`. Replace with actual AI call.
+  return Response.json({ message: "Test endpoint working" });
+}
