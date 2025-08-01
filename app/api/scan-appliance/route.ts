@@ -203,11 +203,19 @@ try {
 }
 
 // MODIFY your return statement to include scanType:
-    return NextResponse.json({
-      success: true,
-      modelNumber,
-      serialNumber,
-      confidence: confidence.toLowerCase(),
-      corrections: corrections.toLowerCase(),
-      scanType: scanType.toLowerCase() // NEW: Include scan type in response
-    });
+      return NextResponse.json({
+        success: true,
+        modelNumber,
+        serialNumber,
+        confidence: confidence.toLowerCase(),
+        corrections: corrections.toLowerCase(),
+        scanType: scanType.toLowerCase() // NEW: Include scan type in response
+      });
+    }
+  } catch (error) {
+    console.error('Error processing scan:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to process scan' },
+      { status: 500 }
+    );
+  }

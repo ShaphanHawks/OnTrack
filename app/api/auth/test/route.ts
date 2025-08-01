@@ -1,11 +1,3 @@
-` tags. I will also ensure that the original code structure and indentation are preserved, and no parts are skipped.
-
-```text
-The code edits address placeholder comments in the GET handler to ensure consistent wording and formatting.
-```
-
-```
-<replit_final_file>
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
