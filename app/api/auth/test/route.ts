@@ -296,5 +296,5 @@ export async function GET() {
   // and enhancedPromptText to Gemini or another AI model.
   // For demonstration, we'll use a mock extractedTextFromAI.
   // For demonstration, we'll use a mock extractedTextFromAI. Replace with actual AI call.
-  return Response.json({ message: "Test endpoint working" });
+  return NextResponse.json({ message: "Test endpoint working" });
 }

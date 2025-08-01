@@ -17,17 +17,17 @@ async function logScanResult(result: ScanResult): Promise<void> {
   try {
     const logDir = path.join(process.cwd(), 'logs')
     const logFile = path.join(logDir, 'scan_log.txt')
-    
+
     // Ensure logs directory exists
     try {
       await fs.access(logDir)
     } catch {
       await fs.mkdir(logDir, { recursive: true })
     }
-    
+
     // Create log entry
     const logEntry = `${result.timestamp} | ${result.modelNumber} | ${result.serialNumber} | ${result.scanType.toUpperCase()} | ${result.corrections.toUpperCase()}\n`
-    
+
     // Append to log file
     await fs.appendFile(logFile, logEntry, 'utf8')
     console.log('Scan logged successfully')
@@ -118,32 +118,32 @@ Follow these steps:
    Confidence: [HIGH/MEDIUM/LOW]
    Corrections: [NONE/SPACING/LINEBREAK/CHARACTERS/MULTIPLE]
    ScanType: [BARCODE/QR/OCR/MIXED]
-   
+
    * SCANTYPE field must indicate the primary source of information:
      - BARCODE: Model/Serial primarily from traditional barcode
      - QR: Model/Serial primarily from QR code
      - OCR: Model/Serial primarily from text reading
      - MIXED: Some data from codes, some from text
-   
+
    * CORRECTIONS field should indicate what type(s) of corrections were applied:
      - NONE: No corrections needed
      - SPACING: Removed inappropriate spaces
      - LINEBREAK: Combined text from multiple lines
      - CHARACTERS: Fixed ambiguous character substitutions
      - MULTIPLE: Applied multiple correction types
-   
+
    * CONFIDENCE levels:
      - HIGH: Clear barcode/QR read OR clear text with minimal corrections
      - MEDIUM: Text required corrections but pattern-confident
      - LOW: Multiple corrections applied or pattern uncertain
-   
+
    Examples:
    Model: 111.61262220
    Serial: FT220001234
    Confidence: MEDIUM
    Corrections: LINEBREAK
    ScanType: OCR
-   
+
    Model: WOS51EC0HS20
    Serial: Not found
    Confidence: HIGH
@@ -203,11 +203,11 @@ try {
 }
 
 // MODIFY your return statement to include scanType:
-return NextResponse.json({
-  success: true,
-  modelNumber,
-  serialNumber,
-  confidence: confidence.toLowerCase(),
-  corrections: corrections.toLowerCase(),
-  scanType: scanType.toLowerCase(), // NEW: Include scan type in response
-})
+    return NextResponse.json({
+      success: true,
+      modelNumber,
+      serialNumber,
+      confidence: confidence.toLowerCase(),
+      corrections: corrections.toLowerCase(),
+      scanType: scanType.toLowerCase() // NEW: Include scan type in response
+    });
