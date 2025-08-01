@@ -1,6 +1,7 @@
-// Add these imports at the top of your existing file
+import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs'
 import path from 'path'
+import { kv } from "@vercel/kv";
 
 // Add this interface near the top after your existing imports
 interface ScanResult {
@@ -11,6 +12,14 @@ interface ScanResult {
   scanType: 'barcode' | 'qr' | 'ocr' | 'mixed'
   timestamp: string
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    console.log("Received request to process appliance tag.");
+
+    // Initialize variables for storing extracted data
+    let modelNumber: string = "Not found";
+    let serialNumber: string = "Not found";
 
 // Add this logging function - place it before your main POST function
 async function logScanResult(result: ScanResult): Promise<void> {
@@ -203,15 +212,15 @@ try {
 }
 
 // MODIFY your return statement to include scanType:
-      return NextResponse.json({
-        success: true,
-        modelNumber,
-        serialNumber,
-        confidence: confidence.toLowerCase(),
-        corrections: corrections.toLowerCase(),
-        scanType: scanType.toLowerCase() // NEW: Include scan type in response
-      });
-    }
+    return NextResponse.json({
+      success: true,
+      modelNumber,
+      serialNumber,
+      confidence: confidence.toLowerCase(),
+      corrections: corrections.toLowerCase(),
+      scanType: scanType.toLowerCase() // NEW: Include scan type in response
+    });
+
   } catch (error) {
     console.error('Error processing scan:', error);
     return NextResponse.json(
@@ -219,3 +228,4 @@ try {
       { status: 500 }
     );
   }
+}
