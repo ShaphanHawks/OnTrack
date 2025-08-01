@@ -23,11 +23,9 @@ export default function RootLayout({
     <html lang="en">
 
 <head>
-  {/* Google Analytics gtag.js snippet */}
-  <script
-    async
-    src="https://www.googletagmanager.com/gtag/js?id=G-2TM1920237"
-  />
+  {/*Plausible  */}
+<script defer data-domain="ontrack.tools" src="https://plausible.io/js/script.js"></script>
+
   <script
     dangerouslySetInnerHTML={{
       __html: `
@@ -38,12 +36,7 @@ export default function RootLayout({
       `,
     }}
   />
-  {/* Plausible Analytics */}
-  <script
-    defer
-    data-domain="ontrack.tools"
-    src="https://plausible.io/js/script.js"
-  />
+  
 </head>
 
       <body className={inter.className}>
